@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="flatlaf">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../qbtv2/lib/flatlaf.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

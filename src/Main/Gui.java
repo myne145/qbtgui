@@ -1,0 +1,287 @@
+package Main;
+
+import com.formdev.flatlaf.ui.FlatRoundBorder;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.awt.datatransfer.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Gui extends JFrame {
+
+    public static void alert(AlertType alertType, String message) {
+        switch(alertType) {
+            case INFO -> JOptionPane.showMessageDialog(null, message, "Information", JOptionPane.INFORMATION_MESSAGE);
+            case ERROR -> JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+            case WARNING -> JOptionPane.showMessageDialog(null, message, "Warning", JOptionPane.WARNING_MESSAGE);
+            case FATAL -> JOptionPane.showMessageDialog(null, message, "Fatal Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private final DefaultListModel<Object> listModel = new DefaultListModel<>();
+    private final JList<Object> list = new JList<>(listModel);
+    private JCheckBoxMenuItem copyItem;
+    private final FileDialog fileDialog = new FileDialog(new Frame(), "Select Torrent Files");
+    private final static Dimension scrRes = Toolkit.getDefaultToolkit().getScreenSize();
+    private final static int scrX = scrRes.width;
+    private final static int scrY = scrRes.height;
+    private final DefaultTableModel tableModel = new DefaultTableModel();
+
+
+
+    private static String getFileExtension(File file) {
+        String name = file.getName();
+        int lastIndexOf = name.lastIndexOf(".");
+        if (lastIndexOf == -1) {
+            return ""; // empty extension
+        }
+        return name.substring(lastIndexOf);
+    }
+
+    public Gui() {
+        super("TopLevelTransferHandlerDemo");
+        setLayout(null);
+        setJMenuBar(createDummyMenuBar());
+        getContentPane().add(createDummyToolBar(), BorderLayout.NORTH);
+        setTitle("Qbittorrent WebUI Downloader");
+        list.setBounds(0,40,450, 520);
+        list.setDragEnabled(true);
+        list.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        list.setBorder(new FlatRoundBorder());
+        listModel.add(0, "Drop Files Here");
+        list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        //output.setBounds(480,40,300,520);
+        tableModel.addColumn("Test");
+        //add(output);
+        add(list);
+
+
+        TransferHandler handler = new TransferHandler() {
+            public boolean canImport(TransferSupport support) {
+                if (!support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                    return false;
+                }
+
+                if (copyItem.isSelected()) {
+                    boolean copySupported = (COPY & support.getSourceDropActions()) == COPY;
+
+                    if (!copySupported) {
+                        return false;
+                    }
+
+                    support.setDropAction(COPY);
+                }
+
+                return true;
+            }
+
+
+
+            public boolean importData(TransferSupport support) {
+                if (!canImport(support)) {
+                    return false;
+                }
+
+                Transferable t = support.getTransferable();
+                ArrayList<File> fileList = new ArrayList<>();
+
+                if(listModel.get(0).equals("Drop Files Here"))
+                    listModel.remove(0);
+                try {
+                    List<File> l = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
+                    for (File f : l) {
+                        if(getFileExtension(f).equals(".torrent")) {
+                            listModel.add(listModel.size(), f.getName());
+                            fileList.add(f);
+                        } else {
+                            listModel.add(listModel.size(), "File is not a torrent!");
+                        }
+                        //System.out.println(f);
+                    }
+                    QBitAPI.files.addAll(fileList);
+                } catch (UnsupportedFlavorException | IOException e) {
+                    return false;
+                }
+
+                return true;
+            }
+        };
+        list.setTransferHandler(handler);
+
+    }
+
+    private static void createAndShowGUI() {
+        try {
+            UIManager.setLookAndFeel("com.formdev.flatlaf.FlatDarkLaf");
+        } catch (Exception e) {
+            alert(AlertType.ERROR, "Cannot load windows decorations");
+        }
+
+        try {
+            System.out.println(QBitAPI.initiateConnection());
+        } catch (Exception e) {
+            alert(AlertType.FATAL, "Cannot connect to server - IOException");
+            System.exit(0);
+        }
+        Gui test = new Gui();
+        test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        test.setSize(465, 600);
+        test.setLocation(scrX / 2 - 232, scrY / 2 - 300);
+        //test.setPreferredSize(new Dimension(1000,600));
+        test.setVisible(true);
+        test.list.requestFocus();
+    }
+
+
+
+    public static void main(final String[] args) {
+        QBitAPI.initializeConfigFile();
+        SwingUtilities.invokeLater(() -> {
+        UIManager.put("swing.boldMetal", Boolean.FALSE);
+            createAndShowGUI();
+        });
+    }
+
+
+
+    private JToolBar createDummyToolBar() {
+        JToolBar tb = new JToolBar();
+        tb.setBounds(0,0,1000,40);
+        JButton b;
+        b = new JButton("Open Files");
+        b.setRequestFocusEnabled(false);
+        b.setPreferredSize(new Dimension(100,30));
+
+        b.addActionListener(e -> {
+            fileDialog.setMultipleMode(true);
+            fileDialog.setVisible(true);
+            File[] files = fileDialog.getFiles();
+            ArrayList<File> arr = new ArrayList<>();
+            for (File file : files) {
+                if(getFileExtension(file).equals(".torrent")) {
+                    listModel.add(listModel.size(), file);
+                    arr.add(file);
+                } else {
+                    listModel.add(listModel.size(), "File is not a Torrent!");
+                }
+            }
+            QBitAPI.files.addAll(arr);
+        });
+        tb.add(b);
+        b = new JButton("Clear All Files");
+        b.setRequestFocusEnabled(false);
+        b.addActionListener(e -> {
+            QBitAPI.files.clear();
+            listModel.removeAllElements();
+            listModel.add(0, "Drop Files Here");
+        });
+        tb.add(b);
+
+
+        tb.add(b);
+        /*  //TODO: dev
+        b = new JButton("Add Magnet Link");
+        b.setRequestFocusEnabled(false);
+        b.addActionListener(e-> {
+            JDialog jDialog = new JDialog();
+            JLabel label = new JLabel("Enter magnet link below:");
+            JTextArea textArea = new JTextArea();
+            JButton ok = new JButton("Ok");
+            jDialog.setPreferredSize(new Dimension(400,500));
+            jDialog.setLocation(scrX / 2 - 200, scrY / 2 - 250);
+            jDialog.pack();
+            jDialog.setLayout(null);
+            jDialog.setTitle("Enter Magnet Link (ONLY 1 MAGNET LINK FOR NOW)");
+            jDialog.setResizable(false);
+            //jDialog.setIconImage(icon);
+            label.setBounds(0,10,200,30);
+            textArea.setBounds(0,50,jDialog.getWidth(),300);
+            textArea.setLineWrap(true);
+            textArea.setBorder(new FlatRoundBorder());
+            ok.setBounds(300, 400, 70, 30);
+
+            ok.addActionListener(ee -> {
+                if(!textArea.getText().equals("")) {
+                    QBitAPI.magnetLinks.add(textArea.getText()); //TODO: add more than 1 link
+                    jDialog.setVisible(false);
+                    if (listModel.get(0).equals("Drop Files Here"))
+                        listModel.remove(0);
+                    listModel.add(listModel.size(), "Magnet Link");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Magnet link specified is invalid", "Invalid magnet link",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            });
+
+            jDialog.add(ok);
+            jDialog.add(textArea);
+            jDialog.add(label);
+            jDialog.setVisible(true);
+        });
+        tb.add(b);
+        */
+
+        b = new JButton("Start the download on server");
+        b.setRequestFocusEnabled(false);
+        b.addActionListener(e-> {
+            if(QBitAPI.files.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "There are no files to add!", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } else {
+                int errorCode = QBitAPI.addTorrent();
+                if(errorCode == 0)
+                    alert(AlertType.INFO, "Succesfully added " + QBitAPI.files.size() + " torrents and " +
+                            QBitAPI.magnetLinks.size() + " magnet links.");
+                if(errorCode == -1)
+                    JOptionPane.showMessageDialog(null, "Torrent list is empty (somehow), torrents were not added",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                if(errorCode == 1)
+                    JOptionPane.showMessageDialog(null, "Critical Error",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                QBitAPI.files.clear();
+                QBitAPI.magnetLinks.clear();
+                listModel.clear();
+                listModel.add(listModel.size(), "Drop Files Here");
+            }
+        });
+        tb.add(b);
+
+//        b = new JButton("Show Currently Downloading");
+//        b.setRequestFocusEnabled(false);
+//        tb.add(b);
+
+//        b = new JButton("Debug");
+//        b.setRequestFocusEnabled(false);
+//        b.addActionListener(e-> {
+//            QBitAPI.soutFiles();
+//            System.out.println("Magnet Links:");
+//            System.out.println(QBitAPI.magnetLinks.get(0));
+//        });
+//        tb.add(b);
+//        b = new JButton("Debug List");
+//        b.setRequestFocusEnabled(false);
+//        b.addActionListener(e-> {
+//           QBitAPI qBitAPI = new QBitAPI();
+//            try {
+//                listModel.add(listModel.size(), qBitAPI.listTorrents());
+//            } catch (IOException ex) {
+//                ex.printStackTrace();
+//            }
+//
+//        });
+//        tb.add(b);
+        tb.setFloatable(false);
+        return tb;
+    }
+
+    private JMenuBar createDummyMenuBar() {
+        JMenuBar mb = new JMenuBar();
+        copyItem = new JCheckBoxMenuItem("Use COPY Action");
+        copyItem.setMnemonic(KeyEvent.VK_C);
+
+        return mb;
+    }
+}

@@ -1,0 +1,24 @@
+<component name="libraryTable">
+  <library name="FlatLaf-2.5">
+    <CLASSES>
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/" />
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/FlatLaf-2.5/buildSrc/src/main/java" />
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/FlatLaf-2.5/flatlaf-core/src/main/java" />
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/FlatLaf-2.5/flatlaf-core/src/main/java9" />
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/FlatLaf-2.5/flatlaf-core/src/test/java" />
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/FlatLaf-2.5/flatlaf-demo/src/main/java" />
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/FlatLaf-2.5/flatlaf-extras/src/main/java" />
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/FlatLaf-2.5/flatlaf-intellij-themes/src/main/java" />
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/FlatLaf-2.5/flatlaf-jide-oss/src/main/java" />
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/FlatLaf-2.5/flatlaf-natives/flatlaf-natives-jna/src/main/java" />
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/FlatLaf-2.5/flatlaf-swingx/src/main/java" />
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/FlatLaf-2.5/flatlaf-testing/flatlaf-testing-modular-app/src/main/java" />
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/FlatLaf-2.5/flatlaf-testing/src/main/java" />
+      <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/FlatLaf-2.5/flatlaf-theme-editor/src/main/java" />
+    </SOURCES>
+  </library>
+</component>
