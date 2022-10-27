@@ -1,6 +1,8 @@
 package Main;
 
+
 import com.formdev.flatlaf.ui.FlatRoundBorder;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -143,6 +145,26 @@ public class Gui extends JFrame {
         UIManager.put("swing.boldMetal", Boolean.FALSE);
             createAndShowGUI();
         });
+        TorrentList torrentList = new TorrentList("""
+                                Name:       debian-10.0.0-amd64-xfce-CD-1.iso
+                                State:      StalledUpload
+                                Hash:       ff3f0ea6f906b4b17b273b3228a53e7e441ec6e7
+                                Size:       672 137 216 bytes
+                                Progress:   100%
+                                DL Speed:   0  B/s
+                                UP Speed:   0  B/s
+                                Priority:   0
+                                Seeds:      0 of 120
+                                Leechers:   0 of 184
+                                Ratio:      0,26
+                                ETA:
+                                Category:
+                                Tags:
+                                Save path:  D:\\Downloads\\
+                                Added:      29.07.2019 16:27:38
+                                Completion: 29.07.2019 16:29:32
+                                Options:""");
+        System.out.println(torrentList.getInfoToAdd(TorrentInfo.NAME, Unit.MEGABYTE));
     }
 
 
