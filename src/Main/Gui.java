@@ -9,6 +9,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.awt.datatransfer.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Gui extends JFrame {
@@ -247,7 +248,6 @@ public class Gui extends JFrame {
 
 
         tb.add(b);
-        /*  //TODO: dev
         b = new JButton("Add Magnet Link");
         b.setRequestFocusEnabled(false);
         b.addActionListener(e-> {
@@ -261,7 +261,6 @@ public class Gui extends JFrame {
             jDialog.setLayout(null);
             jDialog.setTitle("Enter Magnet Link (ONLY 1 MAGNET LINK FOR NOW)");
             jDialog.setResizable(false);
-            //jDialog.setIconImage(icon);
             label.setBounds(0,10,200,30);
             textArea.setBounds(0,50,jDialog.getWidth(),300);
             textArea.setLineWrap(true);
@@ -270,7 +269,13 @@ public class Gui extends JFrame {
 
             ok.addActionListener(ee -> {
                 if(!textArea.getText().equals("")) {
-                    QBitAPI.magnetLinks.add(textArea.getText()); //TODO: add more than 1 link
+                    String text = textArea.getText();
+                    String[] magnetSplitted = text.split("magnet:");
+                    QBitAPI.magnetLinks.addAll(Arrays.asList(magnetSplitted));
+                    for(int i = 0; i < QBitAPI.magnetLinks.size(); i++) {
+                        QBitAPI.magnetLinks.set(i, QBitAPI.magnetLinks.get(i).replace("\n", ""));
+                    }
+                    //QBitAPI.magnetLinks.add(textArea.getText()); //TODO: add more than 1 link
                     jDialog.setVisible(false);
                     if (listModel.get(0).equals("Drop Files Here"))
                         listModel.remove(0);
@@ -287,7 +292,15 @@ public class Gui extends JFrame {
             jDialog.setVisible(true);
         });
         tb.add(b);
-        */
+        b = new JButton("Debug");
+        b.setRequestFocusEnabled(false);
+        b.addActionListener(e-> {
+            for(int i = 0; i < QBitAPI.magnetLinks.size(); i++) {
+                System.out.println(QBitAPI.magnetLinks.get(i));
+            }
+            System.out.println(QBitAPI.magnetLinks.size());
+        });
+        tb.add(b);
 
         b = new JButton("Start the download on server");
         b.setRequestFocusEnabled(false);
@@ -319,30 +332,6 @@ public class Gui extends JFrame {
             addToJTable(Unit.MEGABYTE);
                 });
         tb.add(b);
-//        b = new JButton("Show Currently Downloading");
-//        b.setRequestFocusEnabled(false);
-//        tb.add(b);
-
-//        b = new JButton("Debug");
-//        b.setRequestFocusEnabled(false);
-//        b.addActionListener(e-> {
-//            QBitAPI.soutFiles();
-//            System.out.println("Magnet Links:");
-//            System.out.println(QBitAPI.magnetLinks.get(0));
-//        });
-//        tb.add(b);
-//        b = new JButton("Debug List");
-//        b.setRequestFocusEnabled(false);
-//        b.addActionListener(e-> {
-//           QBitAPI qBitAPI = new QBitAPI();
-//            try {
-//                listModel.add(listModel.size(), qBitAPI.listTorrents());
-//            } catch (IOException ex) {
-//                ex.printStackTrace();
-//            }
-//
-//        });
-//        tb.add(b);
         tb.setFloatable(false);
         return tb;
     }

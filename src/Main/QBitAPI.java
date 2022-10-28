@@ -112,11 +112,19 @@ public class QBitAPI {
     }
 
     public static int addTorrent() {
+        if(!magnetLinks.isEmpty()) {
+            StringBuilder magnetList = new StringBuilder();
+            for(int i = 0; i < magnetLinks.size(); i++) {
+                magnetList.append(magnetLinks.get(i)).append(" ");
+            }
+        }
         StringBuilder torrentList = new StringBuilder();
         for(int i = 0; i < files.size(); i++) {
             torrentList.append(files.get(i)).append(" ");
         }
+        String outputMagnet = (execAndOutput(".\\qbt\\qbt.exe torrent add url " + magnetLinks));
         String output = (execAndOutput(".\\qbt\\qbt.exe torrent add file " + torrentList));
+
         if(!torrentList.isEmpty() || output.isEmpty()) {
             torrentList.delete(0, torrentList.length());
             return 0;
