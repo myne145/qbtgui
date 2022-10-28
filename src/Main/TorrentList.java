@@ -99,7 +99,11 @@ public class TorrentList {
 //                Completion: 01.06.2018 1:00:02
 //                Options:
 //                """;
-    public TorrentList(String data) {
+    public TorrentList() {
+
+    }
+
+    public void setData(String data) {
         this.data = data;
     }
     private ArrayList<String> getTorrentInfo(TorrentInfo torrentInfo) {
@@ -176,18 +180,20 @@ public class TorrentList {
         }
         ArrayList<String> realSizeList = new ArrayList<>();
         for(int i = 0; i < names.size(); i++) { //very unsafe may throw an outofbounds exception //TODO: fix this
-                String[] s = sizes.get(i).split("\\.");
-//            line.append(names.get(i)).append("\t|\t");
-//            line.append(progress.get(i)).append("\t|\t");
-//            line.append(s[0]).append(".").append(s[1], 0, 1).append(unitName).append("\t|\t");
-//            line.append(hashes.get(i)).append("\t|\t");
-//            line.append("\n");
-            realSizeList.add(s[0] + "," + s[1].charAt(0));
+            String[] s = sizes.get(i).split("\\.");
+            if(s[1].charAt(0) == '0')
+                realSizeList.add(s[0] + unitName);
+            else
+                realSizeList.add(s[0] + "," + s[1].charAt(0) + unitName);
             }
         if(torrentInfo == TorrentInfo.NAME)
             return names;
         if(torrentInfo == TorrentInfo.SIZE)
             return realSizeList;
+        if(torrentInfo == TorrentInfo.HASH)
+            return hashes;
+        if(torrentInfo == TorrentInfo.PROGRESS)
+            return progress;
 
         return new ArrayList<>();
     }

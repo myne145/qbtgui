@@ -2,7 +2,6 @@ package Main;
 
 
 import com.formdev.flatlaf.ui.FlatRoundBorder;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -31,7 +30,53 @@ public class Gui extends JFrame {
     private final static int scrX = scrRes.width;
     private final static int scrY = scrRes.height;
     private final DefaultTableModel tableModel = new DefaultTableModel();
+    private DefaultTableModel torrentListModel = new DefaultTableModel() {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            //all cells false
+            return false;
+        }
+    };
 
+
+    String test = """
+                                Name:       debian-10.0.0-amd64-xfce-CD-1.iso
+                                State:      StalledUpload
+                                Hash:       ff3f0ea6f906b4b17b273b3228a53e7e441ec6e7
+                                Size:       672 137 216 bytes
+                                Progress:   100%
+                                DL Speed:   0  B/s
+                                UP Speed:   0  B/s
+                                Priority:   0
+                                Seeds:      0 of 120
+                                Leechers:   0 of 184
+                                Ratio:      0,26
+                                ETA:
+                                Category:
+                                Tags:
+                                Save path:  D:\\Downloads\\
+                                Added:      29.07.2019 16:27:38
+                                Completion: 29.07.2019 16:29:32
+                                Options:
+                                
+                                Name:       debian-10.0.0-amd64-xfce-CD-1.iso
+                                State:      StalledUpload
+                                Hash:       ff3f0ea6f906b4b17b273b3228a53e7e441ec6e7
+                                Size:       672 137 216 bytes
+                                Progress:   100%
+                                DL Speed:   0  B/s
+                                UP Speed:   0  B/s
+                                Priority:   0
+                                Seeds:      0 of 120
+                                Leechers:   0 of 184
+                                Ratio:      0,26
+                                ETA:
+                                Category:
+                                Tags:
+                                Save path:  D:\\Downloads\\
+                                Added:      29.07.2019 16:27:38
+                                Completion: 29.07.2019 16:29:32
+                                Options:""";
 
 
     private static String getFileExtension(File file) {
@@ -43,12 +88,26 @@ public class Gui extends JFrame {
         return name.substring(lastIndexOf);
     }
 
+
+
     public Gui() {
         super("TopLevelTransferHandlerDemo");
+        JTable torrentListTable = new JTable(torrentListModel);
+        JScrollPane jScrollPane = new JScrollPane(torrentListTable);
         setLayout(null);
         setJMenuBar(createDummyMenuBar());
         getContentPane().add(createDummyToolBar(), BorderLayout.NORTH);
         setTitle("Qbittorrent WebUI Downloader");
+        torrentListTable.setBounds(460, 40, 520,520);
+        torrentListModel.addColumn("name");
+        torrentListModel.addColumn("progress");
+        torrentListModel.addColumn("size");
+        torrentListModel.addRow(new String[]{"Filename","Progress","Size"});
+        //torrentListTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        //torrentListTable.setAutoResizeMode(JTable.);
+        torrentListTable.setBorder(new FlatRoundBorder());
+        jScrollPane.setVisible(true);
+        addToJTable(Unit.MEGABYTE);
         list.setBounds(0,40,450, 520);
         list.setDragEnabled(true);
         list.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -58,6 +117,8 @@ public class Gui extends JFrame {
         //output.setBounds(480,40,300,520);
         tableModel.addColumn("Test");
         //add(output);
+        add(torrentListTable);
+        add(jScrollPane, BorderLayout.CENTER);
         add(list);
 
 
@@ -115,7 +176,7 @@ public class Gui extends JFrame {
 
     }
 
-    private static void createAndShowGUI() {
+    public static void createAndShowGUI() {
         try {
             UIManager.setLookAndFeel("com.formdev.flatlaf.FlatDarkLaf");
         } catch (Exception e) {
@@ -130,42 +191,24 @@ public class Gui extends JFrame {
         }
         Gui test = new Gui();
         test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        test.setSize(465, 600);
+        test.setSize(1000, 600);
         test.setLocation(scrX / 2 - 232, scrY / 2 - 300);
         //test.setPreferredSize(new Dimension(1000,600));
         test.setVisible(true);
         test.list.requestFocus();
     }
 
-
-
-    public static void main(final String[] args) {
-        QBitAPI.initializeConfigFile();
-        SwingUtilities.invokeLater(() -> {
-        UIManager.put("swing.boldMetal", Boolean.FALSE);
-            createAndShowGUI();
-        });
-        TorrentList torrentList = new TorrentList("""
-                                Name:       debian-10.0.0-amd64-xfce-CD-1.iso
-                                State:      StalledUpload
-                                Hash:       ff3f0ea6f906b4b17b273b3228a53e7e441ec6e7
-                                Size:       672 137 216 bytes
-                                Progress:   100%
-                                DL Speed:   0  B/s
-                                UP Speed:   0  B/s
-                                Priority:   0
-                                Seeds:      0 of 120
-                                Leechers:   0 of 184
-                                Ratio:      0,26
-                                ETA:
-                                Category:
-                                Tags:
-                                Save path:  D:\\Downloads\\
-                                Added:      29.07.2019 16:27:38
-                                Completion: 29.07.2019 16:29:32
-                                Options:""");
-        System.out.println(torrentList.getInfoToAdd(TorrentInfo.NAME, Unit.MEGABYTE));
+    private void addToJTable(Unit userSelectedUnit) {
+        TorrentList torrentList = new TorrentList();
+        torrentList.setData(test);
+        for(int i = 0; i < torrentList.getInfoToAdd(TorrentInfo.NAME, userSelectedUnit).size(); i++) {
+            torrentListModel.addRow(new String[]{torrentList.getInfoToAdd(TorrentInfo.NAME, userSelectedUnit).get(i),
+                    torrentList.getInfoToAdd(TorrentInfo.PROGRESS, userSelectedUnit).get(i),
+                    torrentList.getInfoToAdd(TorrentInfo.SIZE, Unit.MEGABYTE).get(i)});
+        }
     }
+
+
 
 
 
@@ -270,7 +313,12 @@ public class Gui extends JFrame {
             }
         });
         tb.add(b);
-
+        b = new JButton("Show Currently Downloading Torrents");
+        b.setRequestFocusEnabled(false);
+        b.addActionListener(e-> {
+            addToJTable(Unit.MEGABYTE);
+                });
+        tb.add(b);
 //        b = new JButton("Show Currently Downloading");
 //        b.setRequestFocusEnabled(false);
 //        tb.add(b);
