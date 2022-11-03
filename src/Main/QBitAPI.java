@@ -76,11 +76,24 @@ public class QBitAPI {
         }
     }
     //test method that works with qbt
-    private void test() throws IOException {
-        Runtime rt = Runtime.getRuntime();
-        String[] commands = {"cmd.exe", "/c cd qbt && qbt settings"};
-        Process proc = rt.exec(commands);
 
+
+    public static String execCmd(String cmd) {
+        String result = null;
+        try (InputStream inputStream = Runtime.getRuntime().exec(cmd).getInputStream();
+             Scanner s = new Scanner(inputStream).useDelimiter("\\A")) {
+            result = s.hasNext() ? s.next() : null;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    private static void test() throws IOException {
+        Runtime rt = Runtime.getRuntime();
+        String[] commands = {"cmd", " /c .\\qbt\\qbt torrent list --format list"};
+        Process proc = rt.exec(commands);
+        for(int i = 0; i < commands.length; i++)
+            System.out.println(commands[i]);
         BufferedReader stdInput = new BufferedReader(new
                 InputStreamReader(proc.getInputStream()));
 
@@ -133,5 +146,12 @@ public class QBitAPI {
             return -1;
         return 1;
         //execAndOutput()
+    }
+
+    public static void getTorrentInfo() throws IOException {
+        //test();
+        TorrentListThread torrentListThread = new TorrentListThread();
+        torrentListThread.start();
+        //System.out.println(execAndOutput(".\\qbt\\qbt.exe torrent list"));
     }
 }

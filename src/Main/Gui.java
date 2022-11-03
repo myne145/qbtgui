@@ -318,11 +318,16 @@ public class Gui extends JFrame {
         b = new JButton("Debug");
         b.setRequestFocusEnabled(false);
         b.addActionListener(e-> {
-            for(int i = 0; i < QBitAPI.magnetLinks.size(); i++) {
-                System.out.println(QBitAPI.magnetLinks.get(i));
+//            for(int i = 0; i < QBitAPI.magnetLinks.size(); i++) {
+//                System.out.println(QBitAPI.magnetLinks.get(i));
+//            }
+//            System.out.println(QBitAPI.magnetLinks.size());
+//            System.out.println(unitIndex);
+            try {
+                QBitAPI.getTorrentInfo();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
             }
-            System.out.println(QBitAPI.magnetLinks.size());
-            System.out.println(unitIndex);
         });
         tb.add(b);
 
