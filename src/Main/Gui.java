@@ -31,6 +31,10 @@ public class Gui extends JFrame {
     private final static int scrX = scrRes.width;
     private final static int scrY = scrRes.height;
     private final DefaultTableModel tableModel = new DefaultTableModel();
+    private final JComboBox<String> selectUnit = new JComboBox<>();
+    private final JLabel selectUnitText = new JLabel("Select displayed unit:");
+
+    private int unitIndex;
     private DefaultTableModel torrentListModel = new DefaultTableModel() {
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -108,7 +112,7 @@ public class Gui extends JFrame {
         //torrentListTable.setAutoResizeMode(JTable.);
         torrentListTable.setBorder(new FlatRoundBorder());
         jScrollPane.setVisible(true);
-        addToJTable(Unit.MEGABYTE);
+        //addToJTable();
         list.setBounds(0,40,450, 520);
         list.setDragEnabled(true);
         list.setFont(new Font("Segoe UI", Font.BOLD, 12));
@@ -118,6 +122,27 @@ public class Gui extends JFrame {
         //output.setBounds(480,40,300,520);
         tableModel.addColumn("Test");
         //add(output);
+        selectUnit.setEditable(false);
+        selectUnit.setVisible(true);
+        selectUnit.setBounds(130,570,60,20);
+        selectUnit.addItem("KB");
+        selectUnit.addItem("MB");
+        selectUnit.addItem("GB");
+        selectUnit.setSelectedIndex(1);
+        this.unitIndex = 1;
+        selectUnit.addItemListener(event -> {
+            this.unitIndex = selectUnit.getSelectedIndex();
+            for(int i = 1; i < torrentListModel.getRowCount(); i++)
+                torrentListModel.removeRow(i);
+            addToJTable();
+            System.out.println(unitIndex);
+        });
+        selectUnitText.setVisible(true);
+        selectUnitText.setBounds(10,570,130,20);
+        //this.unitIndex = selectUnit.getSelectedIndex();
+        //System.out.println(unitIndex);
+        add(selectUnitText);
+        add(selectUnit);
         add(torrentListTable);
         add(jScrollPane, BorderLayout.CENTER);
         add(list);
@@ -128,30 +153,22 @@ public class Gui extends JFrame {
                 if (!support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                     return false;
                 }
-
                 if (copyItem.isSelected()) {
                     boolean copySupported = (COPY & support.getSourceDropActions()) == COPY;
-
                     if (!copySupported) {
                         return false;
                     }
-
                     support.setDropAction(COPY);
                 }
-
                 return true;
             }
-
-
 
             public boolean importData(TransferSupport support) {
                 if (!canImport(support)) {
                     return false;
                 }
-
                 Transferable t = support.getTransferable();
                 ArrayList<File> fileList = new ArrayList<>();
-
                 if(listModel.get(0).equals("Drop Files Here"))
                     listModel.remove(0);
                 try {
@@ -192,20 +209,26 @@ public class Gui extends JFrame {
         }
         Gui test = new Gui();
         test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        test.setSize(1000, 600);
+        test.setSize(1000, 650);
         test.setLocation(scrX / 2 - 232, scrY / 2 - 300);
         //test.setPreferredSize(new Dimension(1000,600));
         test.setVisible(true);
         test.list.requestFocus();
     }
 
-    private void addToJTable(Unit userSelectedUnit) {
+    private void addToJTable() {
+        Unit userSelectedUnit;
+        switch (unitIndex) {
+            case 0 -> userSelectedUnit = Unit.KILOBYTE;
+            case 2 -> userSelectedUnit = Unit.GIGABYTE;
+            default -> userSelectedUnit = Unit.MEGABYTE;
+        }
         TorrentList torrentList = new TorrentList();
         torrentList.setData(test);
         for(int i = 0; i < torrentList.getInfoToAdd(TorrentInfo.NAME, userSelectedUnit).size(); i++) {
             torrentListModel.addRow(new String[]{torrentList.getInfoToAdd(TorrentInfo.NAME, userSelectedUnit).get(i),
                     torrentList.getInfoToAdd(TorrentInfo.PROGRESS, userSelectedUnit).get(i),
-                    torrentList.getInfoToAdd(TorrentInfo.SIZE, Unit.MEGABYTE).get(i)});
+                    torrentList.getInfoToAdd(TorrentInfo.SIZE, userSelectedUnit).get(i)});
         }
     }
 
@@ -299,6 +322,7 @@ public class Gui extends JFrame {
                 System.out.println(QBitAPI.magnetLinks.get(i));
             }
             System.out.println(QBitAPI.magnetLinks.size());
+            System.out.println(unitIndex);
         });
         tb.add(b);
 
@@ -329,7 +353,7 @@ public class Gui extends JFrame {
         b = new JButton("Show Currently Downloading Torrents");
         b.setRequestFocusEnabled(false);
         b.addActionListener(e-> {
-            addToJTable(Unit.MEGABYTE);
+            addToJTable();
                 });
         tb.add(b);
         tb.setFloatable(false);

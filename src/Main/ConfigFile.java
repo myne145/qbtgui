@@ -1,6 +1,6 @@
 package Main;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -17,6 +17,18 @@ public class ConfigFile {
         //Reading config file and adding lines to arraylist
         while(input.hasNextLine()) {
             cfg.add(input.nextLine());
+        }
+
+    }
+
+    public void setSelectedUnt(Unit unit) {
+        Writer output;
+        try {
+            output = new BufferedWriter(new FileWriter(configFile, true));
+            output.append("Hello bitch");
+        }
+        catch(IOException e) {
+            Gui.alert(AlertType.ERROR, "Config File does not exist!");
         }
 
     }
