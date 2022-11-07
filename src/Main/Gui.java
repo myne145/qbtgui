@@ -139,8 +139,6 @@ public class Gui extends JFrame {
         });
         selectUnitText.setVisible(true);
         selectUnitText.setBounds(10,570,130,20);
-        //this.unitIndex = selectUnit.getSelectedIndex();
-        //System.out.println(unitIndex);
         add(selectUnitText);
         add(selectUnit);
         add(torrentListTable);
@@ -318,11 +316,6 @@ public class Gui extends JFrame {
         b = new JButton("Debug");
         b.setRequestFocusEnabled(false);
         b.addActionListener(e-> {
-//            for(int i = 0; i < QBitAPI.magnetLinks.size(); i++) {
-//                System.out.println(QBitAPI.magnetLinks.get(i));
-//            }
-//            System.out.println(QBitAPI.magnetLinks.size());
-//            System.out.println(unitIndex);
             try {
                 QBitAPI.getTorrentInfo();
             } catch (Exception ex) {
