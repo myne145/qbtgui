@@ -317,7 +317,9 @@ public class Gui extends JFrame {
         b.setRequestFocusEnabled(false);
         b.addActionListener(e-> {
             try {
-                QBitAPI.getTorrentInfo();
+                //QBitAPI.getTorrentInfo();
+                TorrentList t = new TorrentList();
+                t.testGson();
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
