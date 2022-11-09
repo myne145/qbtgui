@@ -319,7 +319,7 @@ public class Gui extends JFrame {
             try {
                 //QBitAPI.getTorrentInfo();
                 TorrentList t = new TorrentList();
-                t.testGson();
+                t.processJsonData(Torre);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }

@@ -1,13 +1,9 @@
 package Main;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Scanner;
-import com.google.gson.*;
-import com.google.gson.stream.JsonReader;
-import org.json.JSONArray;
+
 import org.json.JSONObject;
 
 public class TorrentList {
@@ -110,7 +106,7 @@ public class TorrentList {
     public void setData(String data) {
         this.data = data;
     }
-    private ArrayList<String> getTorrentInfo(TorrentInfo torrentInfo) {
+    private ArrayList<String> processJsonData(TorrentInfo torrentInfo) {
         Scanner sc = new Scanner(data);
         ArrayList<String> arr = new ArrayList<>();
         ArrayList<String> result = new ArrayList<>();
@@ -144,8 +140,9 @@ public class TorrentList {
         return result;
     }
 
-    public void testGson() throws FileNotFoundException {
+    public ArrayList<String> processJsonData(TorrentInfo torrentInfo) {
         String[] dataSplit = data.split("},");
+        ArrayList<String> result = new ArrayList<>();
         for(int i = 0; i < dataSplit.length; i++) {
             if(i != dataSplit.length - 1)
                 dataSplit[i] = dataSplit[i] + "}";
@@ -154,13 +151,27 @@ public class TorrentList {
         for(int i = 0; i < dataSplit.length; i++) {
             JSONObject jsonObject = new JSONObject(dataSplit[i]);
             System.out.println(jsonObject.getString("name"));
+            System.out.println(jsonObject.getInt("size"));
+            if(torrentInfo == TorrentInfo.NAME) {
+                result.add(jsonObject.getString("name"));
+            }
+            if(torrentInfo == TorrentInfo.SIZE) {
+                result.add(String.valueOf(jsonObject.getLong("size"))); //ALWAYS returns bytes
+            }
+            if(torrentInfo == TorrentInfo.HASH) {
+                result.add(jsonObject.getString("hash"));
+            }
+            if(torrentInfo == TorrentInfo.PROGRESS) {
+                result.add(jsonObject.getString("progress"));
+            }
         }
+        return result;
 
     }
 
     private ArrayList<String> reloadUnits(Unit convertTo) {
         selectedUnit = convertTo;
-        ArrayList<String> sizes = getTorrentInfo(TorrentInfo.SIZE);
+        ArrayList<String> sizes = processJsonData(TorrentInfo.SIZE);
         for(int i = 0; i < sizes.size(); i++) {
             sizes.set(i, String.valueOf(convertUnits(convertTo, Double.parseDouble(sizes.get(i)))));
         }
@@ -181,10 +192,10 @@ public class TorrentList {
     }
     public ArrayList<String> getInfoToAdd(TorrentInfo torrentInfo, Unit sizeUnit) {
         //jframe table here
-        ArrayList<String> names = getTorrentInfo(TorrentInfo.NAME);
-        ArrayList<String> progress = getTorrentInfo(TorrentInfo.PROGRESS);
-        ArrayList<String> sizes = getTorrentInfo(TorrentInfo.SIZE);
-        ArrayList<String> hashes = getTorrentInfo(TorrentInfo.HASH);
+        ArrayList<String> names = processJsonData(TorrentInfo.NAME);
+        ArrayList<String> progress = processJsonData(TorrentInfo.PROGRESS);
+        ArrayList<String> sizes = processJsonData(TorrentInfo.SIZE);
+        ArrayList<String> hashes = processJsonData(TorrentInfo.HASH);
         StringBuilder line = new StringBuilder();
         String unitName = "ERROR";
         for(int i = 0; i < sizes.size(); i++) {
