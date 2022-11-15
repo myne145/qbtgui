@@ -33,9 +33,8 @@ public class Gui extends JFrame {
     private final DefaultTableModel tableModel = new DefaultTableModel();
     private final JComboBox<String> selectUnit = new JComboBox<>();
     private final JLabel selectUnitText = new JLabel("Select displayed unit:");
-
     private int unitIndex;
-    private DefaultTableModel torrentListModel = new DefaultTableModel() {
+    public DefaultTableModel torrentListModel = new DefaultTableModel() {
         @Override
         public boolean isCellEditable(int row, int column) {
             //all cells false
@@ -316,13 +315,21 @@ public class Gui extends JFrame {
         b = new JButton("Debug");
         b.setRequestFocusEnabled(false);
         b.addActionListener(e-> {
-            try {
-                //QBitAPI.getTorrentInfo();
-                TorrentList t = new TorrentList();
-                t.processJsonData(Torre);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
+//            try {
+//                //QBitAPI.getTorrentInfo();
+//                TorrentList t = new TorrentList();
+//                for(int i = 0; i < 4; i++) {
+//                    String[] line = {t.getInfoToAdd(TorrentInfo.NAME, Unit.MEGABYTE).get(i), t.getInfoToAdd(TorrentInfo.SIZE, Unit.MEGABYTE).get(i)};
+//                    torrentListModel.addRow(line);
+//                }
+//
+//            } catch (Exception ex) {
+//                throw new RuntimeException(ex);
+//            }
+            TorrentListThread thread = new TorrentListThread();
+            thread.start();
+            TorrentList t = new TorrentList();
+            System.out.println(t.data);
         });
         tb.add(b);
 

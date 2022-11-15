@@ -1,11 +1,11 @@
 package Main;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class TorrentListThread extends Thread {
-
-    private static OutputStream refreshTorrentList() throws IOException {
+    private OutputStream refreshTorrentList() throws IOException {
         //stackoverflow code
         OutputStream output = new OutputStream() {
             private final StringBuilder string = new StringBuilder();
@@ -27,7 +27,10 @@ public class TorrentListThread extends Thread {
     public void run() {
         super.run();
         try {
-            System.out.println(refreshTorrentList());
+            TorrentList t = new TorrentList();
+            t.setData(refreshTorrentList().toString());
+            //gui.torrentListModel.addRow(refreshTorrentList());
+            //refreshTorrentList();
         } catch (IOException e) {
             Gui.alert(AlertType.ERROR, "Cannot load torrent list" + "\n" + Arrays.toString(e.getStackTrace()));
         }

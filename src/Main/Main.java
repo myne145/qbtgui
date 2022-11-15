@@ -9,7 +9,5 @@ public class Main {
             UIManager.put("swing.boldMetal", Boolean.FALSE);
             Gui.createAndShowGUI();
         });
-//        ConfigFile c = new ConfigFile();
-//        c.setSelectedUnt(Unit.MEGABYTE);
     }
 }
