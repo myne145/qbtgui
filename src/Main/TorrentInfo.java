@@ -5,5 +5,6 @@ public enum TorrentInfo {
     HASH,
     SPEED,
     SIZE,
-    PROGRESS
+    PROGRESS,
+    ALL
 }

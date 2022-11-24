@@ -33,7 +33,7 @@ public class Gui extends JFrame {
     private final DefaultTableModel tableModel = new DefaultTableModel();
     private final JComboBox<String> selectUnit = new JComboBox<>();
     private final JLabel selectUnitText = new JLabel("Select displayed unit:");
-    private int unitIndex;
+    public static int unitIndex;
     public DefaultTableModel torrentListModel = new DefaultTableModel() {
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -41,46 +41,10 @@ public class Gui extends JFrame {
             return false;
         }
     };
+    public JTable torrentListTable = new JTable(torrentListModel);
+    private JScrollPane jScrollPane = new JScrollPane(torrentListTable);
 
 
-    String test = """
-                                Name:       debian-10.0.0-amd64-xfce-CD-1.iso
-                                State:      StalledUpload
-                                Hash:       ff3f0ea6f906b4b17b273b3228a53e7e441ec6e7
-                                Size:       672 137 216 bytes
-                                Progress:   100%
-                                DL Speed:   0  B/s
-                                UP Speed:   0  B/s
-                                Priority:   0
-                                Seeds:      0 of 120
-                                Leechers:   0 of 184
-                                Ratio:      0,26
-                                ETA:
-                                Category:
-                                Tags:
-                                Save path:  D:\\Downloads\\
-                                Added:      29.07.2019 16:27:38
-                                Completion: 29.07.2019 16:29:32
-                                Options:
-                                
-                                Name:       debian-10.0.0-amd64-xfce-CD-1.iso
-                                State:      StalledUpload
-                                Hash:       ff3f0ea6f906b4b17b273b3228a53e7e441ec6e7
-                                Size:       672 137 216 bytes
-                                Progress:   100%
-                                DL Speed:   0  B/s
-                                UP Speed:   0  B/s
-                                Priority:   0
-                                Seeds:      0 of 120
-                                Leechers:   0 of 184
-                                Ratio:      0,26
-                                ETA:
-                                Category:
-                                Tags:
-                                Save path:  D:\\Downloads\\
-                                Added:      29.07.2019 16:27:38
-                                Completion: 29.07.2019 16:29:32
-                                Options:""";
 
 
     private static String getFileExtension(File file) {
@@ -96,8 +60,6 @@ public class Gui extends JFrame {
 
     public Gui() {
         super("TopLevelTransferHandlerDemo");
-        JTable torrentListTable = new JTable(torrentListModel);
-        JScrollPane jScrollPane = new JScrollPane(torrentListTable);
         setLayout(null);
         setJMenuBar(createDummyMenuBar());
         getContentPane().add(createDummyToolBar(), BorderLayout.NORTH);
@@ -133,7 +95,6 @@ public class Gui extends JFrame {
             this.unitIndex = selectUnit.getSelectedIndex();
             for(int i = 1; i < torrentListModel.getRowCount(); i++)
                 torrentListModel.removeRow(i);
-            addToJTable();
             System.out.println(unitIndex);
         });
         selectUnitText.setVisible(true);
@@ -213,22 +174,10 @@ public class Gui extends JFrame {
         test.list.requestFocus();
     }
 
-    private void addToJTable() {
-        Unit userSelectedUnit;
-        switch (unitIndex) {
-            case 0 -> userSelectedUnit = Unit.KILOBYTE;
-            case 2 -> userSelectedUnit = Unit.GIGABYTE;
-            default -> userSelectedUnit = Unit.MEGABYTE;
-        }
-        TorrentList torrentList = new TorrentList();
-        torrentList.setData(test);
-        for(int i = 0; i < torrentList.getInfoToAdd(TorrentInfo.NAME, userSelectedUnit).size(); i++) {
-            torrentListModel.addRow(new String[]{torrentList.getInfoToAdd(TorrentInfo.NAME, userSelectedUnit).get(i),
-                    torrentList.getInfoToAdd(TorrentInfo.PROGRESS, userSelectedUnit).get(i),
-                    torrentList.getInfoToAdd(TorrentInfo.SIZE, userSelectedUnit).get(i)});
-        }
-    }
 
+    public void addTorrentData() {
+        torrentListModel.addRow(new String[]{"Filename","Progress","Size"});
+    }
 
 
 
@@ -328,8 +277,12 @@ public class Gui extends JFrame {
 //            }
             TorrentListThread thread = new TorrentListThread();
             thread.start();
-            TorrentList t = new TorrentList();
-            System.out.println(t.data);
+
+
+            //addTorrentData();
+            //TorrentList t = new TorrentList();
+
+            //System.out.println(t.data);
         });
         tb.add(b);
 
@@ -360,7 +313,7 @@ public class Gui extends JFrame {
         b = new JButton("Show Currently Downloading Torrents");
         b.setRequestFocusEnabled(false);
         b.addActionListener(e-> {
-            addToJTable();
+            //addToJTable(); initial button
                 });
         tb.add(b);
         tb.setFloatable(false);
