@@ -150,8 +150,8 @@ public class QBitAPI {
 
     public static void getTorrentInfo() throws IOException {
         //test();
-        TorrentListThread torrentListThread = new TorrentListThread();
-        torrentListThread.start();
+//        TorrentListThread torrentListThread = new TorrentListThread();
+//        torrentListThread.start();
         //System.out.println(execAndOutput(".\\qbt\\qbt.exe torrent list"));
     }
 }

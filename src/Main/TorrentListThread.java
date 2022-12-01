@@ -19,7 +19,10 @@ public class TorrentListThread extends Thread {
     private ArrayList<String> hashes = new ArrayList<>();
     private String unitSymbol;
     public static boolean isReady = false;
-
+    private DefaultTableModel model;
+    public TorrentListThread(DefaultTableModel model) {
+        this.model = model;
+    }
     private OutputStream refreshTorrentList() throws IOException {
         //stackoverflow code
         OutputStream output = new OutputStream() {
@@ -81,6 +84,22 @@ public class TorrentListThread extends Thread {
         }
     }
 
+    private ArrayList<String> progressConverter() {
+        ArrayList<String> arr = new ArrayList<>();
+        for(int i = 0; i < progresses.size(); i++) {
+            int progressPerrcentage = 100;
+            if(progresses.get(i).toString().length() >= 4)
+                progressPerrcentage = Integer.parseInt(progresses.get(i).toString().substring(2,4));
+
+            if(progresses.get(i).toString().charAt(0) == '1')
+                progressPerrcentage = 100;
+
+            arr.add(progressPerrcentage + "%");
+
+        }
+        return arr;
+    }
+
 
 
     @Override
@@ -90,10 +109,17 @@ public class TorrentListThread extends Thread {
             Gui g = new Gui();
             processTorrentData();
             unitConversion();
-            isReady = true;
+            DefaultTableModel d = new DefaultTableModel();
+            //g.torrentListTable.setModel(d);
+
+//            g.torrentListModel.addRow(new String[]{"test","test1","test2"});
+//            g.torrentListModel.fireTableDataChanged();
+            //isReady = true;
             for(int i = 0; i < names.size(); i++) {
-                System.out.println(names.get(i) + "\t" + sizes.get(i) + unitSymbol + "\t" + progresses.get(i));
+                model.addRow(new String[]{names.get(i),progressConverter().get(i), sizes.get(i) + unitSymbol});
+                //System.out.println(names.get(i) + "\t" + sizes.get(i) + unitSymbol + "\t" + progresses.get(i));
             }
+            progressConverter();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

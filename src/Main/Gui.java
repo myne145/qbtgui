@@ -264,25 +264,9 @@ public class Gui extends JFrame {
         b = new JButton("Debug");
         b.setRequestFocusEnabled(false);
         b.addActionListener(e-> {
-//            try {
-//                //QBitAPI.getTorrentInfo();
-//                TorrentList t = new TorrentList();
-//                for(int i = 0; i < 4; i++) {
-//                    String[] line = {t.getInfoToAdd(TorrentInfo.NAME, Unit.MEGABYTE).get(i), t.getInfoToAdd(TorrentInfo.SIZE, Unit.MEGABYTE).get(i)};
-//                    torrentListModel.addRow(line);
-//                }
-//
-//            } catch (Exception ex) {
-//                throw new RuntimeException(ex);
-//            }
-            TorrentListThread thread = new TorrentListThread();
+            TorrentListThread thread = new TorrentListThread(torrentListModel);
             thread.start();
-
-
-            //addTorrentData();
-            //TorrentList t = new TorrentList();
-
-            //System.out.println(t.data);
+            if(torrentListModel)
         });
         tb.add(b);
 
