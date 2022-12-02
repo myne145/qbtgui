@@ -114,9 +114,30 @@ public class QBitAPI {
         }
     }
 
-    public static String initiateConnection() {
-        String outUsername = execAndOutput(qbtPath + "settings set username " + username);
-        String outUrl = execAndOutput(qbtPath + "settings set url " + serverIp);
+    private static OutputStream getCmdData(String cmd) throws IOException {
+        //stackoverflow code
+        OutputStream output = new OutputStream() {
+            StringBuilder string = new StringBuilder();
+
+            @Override
+            public void write(int b) {
+                this.string.append((char) b);
+            }
+
+            public String toString() {
+                return this.string.toString();
+            }
+        };
+        Process p = Runtime.getRuntime().exec(cmd);
+        p.getInputStream().transferTo(output);
+        p.getErrorStream().transferTo(output);
+        //System.out.println(output);
+        return output;
+    }
+
+    public static String initiateConnection() throws IOException {
+        String outUsername = getCmdData(".\\qbt\\qbt.exe settings set username admin").toString();
+        String outUrl = getCmdData(".\\qbt\\qbt.exe settings set url http://192.168.2.99:8080").toString();
         if(outUsername.equals("") && outUrl.equals("")) {
             return "Connection Initialized successfully.";
         } else {

@@ -34,6 +34,7 @@ public class Gui extends JFrame {
     private final JComboBox<String> selectUnit = new JComboBox<>();
     private final JLabel selectUnitText = new JLabel("Select displayed unit:");
     public static int unitIndex;
+    private final JLabel refreshingPlsWait = new JLabel("Refreshing Torrents, Please Wait...");
     public DefaultTableModel torrentListModel = new DefaultTableModel() {
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -46,7 +47,15 @@ public class Gui extends JFrame {
 
 
 
+    private void startThread() {
+        TorrentListThread thread = new TorrentListThread(torrentListModel, unitIndex);
 
+
+        if(torrentListTable.getRowCount() > 1) {
+            torrentListModel.setRowCount(1);
+        }
+        thread.start();
+    }
     private static String getFileExtension(File file) {
         String name = file.getName();
         int lastIndexOf = name.lastIndexOf(".");
@@ -82,6 +91,12 @@ public class Gui extends JFrame {
         list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         //output.setBounds(480,40,300,520);
         tableModel.addColumn("Test");
+
+//        refreshingPlsWait.setVisible(true);
+//        refreshingPlsWait.setBounds(450, 570, 30, 90);
+        refreshingPlsWait.setVisible(true);
+        refreshingPlsWait.setBounds(750,570,230,20);
+
         //add(output);
         selectUnit.setEditable(false);
         selectUnit.setVisible(true);
@@ -90,13 +105,16 @@ public class Gui extends JFrame {
         selectUnit.addItem("MB");
         selectUnit.addItem("GB");
         selectUnit.setSelectedIndex(1);
-        this.unitIndex = 1;
+        unitIndex = 1;
         selectUnit.addItemListener(event -> {
-            this.unitIndex = selectUnit.getSelectedIndex();
-            for(int i = 1; i < torrentListModel.getRowCount(); i++)
-                torrentListModel.removeRow(i);
-            System.out.println(unitIndex);
+            if(event.getStateChange() == ItemEvent.SELECTED) {
+                unitIndex = selectUnit.getSelectedIndex();
+                startThread();
+            }
         });
+//        selectUnit.addItemListener(e -> {
+//            System.out.println(e.getItem() + " " + e.getStateChange());
+//        });
         selectUnitText.setVisible(true);
         selectUnitText.setBounds(10,570,130,20);
         add(selectUnitText);
@@ -104,6 +122,7 @@ public class Gui extends JFrame {
         add(torrentListTable);
         add(jScrollPane, BorderLayout.CENTER);
         add(list);
+        add(refreshingPlsWait);
 
 
         TransferHandler handler = new TransferHandler() {
@@ -180,7 +199,12 @@ public class Gui extends JFrame {
     }
 
 
-
+    public static boolean isEmpty(JTable jTable) {
+        if (jTable != null && jTable.getModel() != null) {
+            return jTable.getModel().getRowCount()<=0?true:false;
+        }
+        return false;
+    }
 
     private JToolBar createDummyToolBar() {
         JToolBar tb = new JToolBar();
@@ -264,9 +288,7 @@ public class Gui extends JFrame {
         b = new JButton("Debug");
         b.setRequestFocusEnabled(false);
         b.addActionListener(e-> {
-            TorrentListThread thread = new TorrentListThread(torrentListModel);
-            thread.start();
-            if(torrentListModel)
+
         });
         tb.add(b);
 
@@ -297,8 +319,8 @@ public class Gui extends JFrame {
         b = new JButton("Show Currently Downloading Torrents");
         b.setRequestFocusEnabled(false);
         b.addActionListener(e-> {
-            //addToJTable(); initial button
-                });
+            startThread();
+            });
         tb.add(b);
         tb.setFloatable(false);
         return tb;

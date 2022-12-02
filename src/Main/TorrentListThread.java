@@ -2,15 +2,12 @@ package Main;
 
 import org.json.JSONObject;
 
-import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import java.io.*;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class TorrentListThread extends Thread {
     public ArrayList<String> names = new ArrayList<>();
@@ -19,8 +16,10 @@ public class TorrentListThread extends Thread {
     private ArrayList<String> hashes = new ArrayList<>();
     private String unitSymbol;
     public static boolean isReady = false;
+    private int unitIndex;
     private DefaultTableModel model;
-    public TorrentListThread(DefaultTableModel model) {
+    public TorrentListThread(DefaultTableModel model, int unitIndex) {
+        this.unitIndex = unitIndex;
         this.model = model;
     }
     private OutputStream refreshTorrentList() throws IOException {
@@ -58,7 +57,12 @@ public class TorrentListThread extends Thread {
     private void processTorrentData() throws IOException {
         ArrayList<String> splitData = splitJsons();
         for(int i = 0; i < splitData.size(); i++) {
-            JSONObject data = new JSONObject(splitData.get(i));
+            JSONObject data = new JSONObject();
+            try {
+                data = new JSONObject(splitData.get(i));
+            } catch(Exception e) {
+                Gui.alert(AlertType.WARNING, e.getMessage() + "\n probably nothing special");
+            }
             this.names.add(data.getString("name"));
             this.sizes.add((double) data.getLong("size")); //ALWAYS returns bytes
             this.hashes.add(data.getString("hash"));
@@ -68,7 +72,8 @@ public class TorrentListThread extends Thread {
 
     private void unitConversion() {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        switch(Gui.unitIndex) {
+        System.out.println("Index :" + unitIndex);
+        switch(unitIndex) {
             case 0 -> {
                 sizes.replaceAll(aLong -> Double.valueOf(decimalFormat.format(aLong / 1024)));
                 unitSymbol = "kb";
@@ -115,6 +120,12 @@ public class TorrentListThread extends Thread {
 //            g.torrentListModel.addRow(new String[]{"test","test1","test2"});
 //            g.torrentListModel.fireTableDataChanged();
             //isReady = true;
+//            if(!names.isEmpty() || !progressConverter().isEmpty() || !sizes.isEmpty()) {
+//                names.clear();
+//                progressConverter().clear();
+//                sizes.clear();
+//                processTorrentData();
+//             }
             for(int i = 0; i < names.size(); i++) {
                 model.addRow(new String[]{names.get(i),progressConverter().get(i), sizes.get(i) + unitSymbol});
                 //System.out.println(names.get(i) + "\t" + sizes.get(i) + unitSymbol + "\t" + progresses.get(i));
