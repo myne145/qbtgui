@@ -2,12 +2,14 @@ package Main;
 
 import org.json.JSONObject;
 
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.io.*;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 public class TorrentListThread extends Thread {
     public ArrayList<String> names = new ArrayList<>();
@@ -16,11 +18,13 @@ public class TorrentListThread extends Thread {
     private ArrayList<String> hashes = new ArrayList<>();
     private String unitSymbol;
     public static boolean isReady = false;
+    private JButton guiButton;
     private int unitIndex;
     private DefaultTableModel model;
-    public TorrentListThread(DefaultTableModel model, int unitIndex) {
+    public TorrentListThread(DefaultTableModel model, int unitIndex, JButton j) {
         this.unitIndex = unitIndex;
         this.model = model;
+        this.guiButton = j;
     }
     private OutputStream refreshTorrentList() throws IOException {
         //stackoverflow code
@@ -61,7 +65,7 @@ public class TorrentListThread extends Thread {
             try {
                 data = new JSONObject(splitData.get(i));
             } catch(Exception e) {
-                Gui.alert(AlertType.WARNING, e.getMessage() + "\n probably nothing special");
+                Gui.alert(AlertType.ERROR, e.getMessage() + "\n whatever that means");
             }
             this.names.add(data.getString("name"));
             this.sizes.add((double) data.getLong("size")); //ALWAYS returns bytes
@@ -84,7 +88,7 @@ public class TorrentListThread extends Thread {
             }
             case 2 -> {
                 sizes.replaceAll(aLong -> Double.valueOf(decimalFormat.format(aLong / 1073741824)));
-                unitSymbol = "gb;";
+                unitSymbol = "gb";
             }
         }
     }
@@ -127,12 +131,16 @@ public class TorrentListThread extends Thread {
 //                processTorrentData();
 //             }
             for(int i = 0; i < names.size(); i++) {
-                model.addRow(new String[]{names.get(i),progressConverter().get(i), sizes.get(i) + unitSymbol});
+                if(!names.get(i).isEmpty())
+                    model.addRow(new String[]{names.get(i),progressConverter().get(i), sizes.get(i) + unitSymbol});
                 //System.out.println(names.get(i) + "\t" + sizes.get(i) + unitSymbol + "\t" + progresses.get(i));
             }
+            guiButton.setEnabled(true);
+            g.selectUnit.setEnabled(true);
+            g.selectUnitText.setEnabled(true);
             progressConverter();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            Gui.alert(AlertType.ERROR, e.getLocalizedMessage());
         }
 
     }
