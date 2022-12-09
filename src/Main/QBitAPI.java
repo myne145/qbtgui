@@ -13,11 +13,11 @@ public class QBitAPI {
     private static String qbtPath;
 
     public static void initializeConfigFile() {
-        ConfigFile configFile = new ConfigFile();
-        username = configFile.getLoginValue(Authentication.USERNAME);
-        password = configFile.getLoginValue(Authentication.PASSWORD);
-        serverIp = configFile.getLoginValue(Authentication.SERVERIP);
-        qbtPath = configFile.getLoginValue(Authentication.QBTPATH);
+//        Config configFile = new Config();
+//        username = configFile.getLoginValue(Authentication.USERNAME);
+//        password = configFile.getLoginValue(Authentication.PASSWORD);
+//        serverIp = configFile.getLoginValue(Authentication.SERVERIP);
+//        qbtPath = configFile.getLoginValue(Authentication.QBTPATH);
     }
 
     //Execute files and get output (not working for qbt!!!)
