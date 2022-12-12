@@ -27,7 +27,7 @@ public class Gui extends JPanel {
     private final DefaultListModel<Object> listModel = new DefaultListModel<>();
     private final JList<Object> list = new JList<>(listModel);
     private JCheckBoxMenuItem copyItem;
-    private final FileDialog fileDialog = new FileDialog(new Frame(), "Select Torrent Files");
+    private final FileDialog fileDialog = new FileDialog((Dialog) null, "Select Torrent Files");
     private final static Dimension scrRes = Toolkit.getDefaultToolkit().getScreenSize();
     private final static int scrX = scrRes.width;
     private final static int scrY = scrRes.height;
@@ -49,6 +49,7 @@ public class Gui extends JPanel {
     JScrollPane scrollTest = new JScrollPane(torrentListTable);
 
     JButton finalB;
+    private JScrollPane listScrollPane = new JScrollPane();
 
     public boolean isThreadRunning = false;
     private void startThread(JButton j, JComboBox<String> jsp) {
@@ -102,6 +103,9 @@ public class Gui extends JPanel {
                 startThread(b, selectUnit);
             }
         });
+        listScrollPane.setViewportView(list);
+        list.setLayoutOrientation(JList.VERTICAL);
+        add(listScrollPane);
         add(selectUnitText);
         add(selectUnit);
         add(torrentListTable);
@@ -231,7 +235,7 @@ public class Gui extends JPanel {
 //        JButton finalB = b;
         finalB = b;
         b.addActionListener(e-> {
-                JDialog jDialog = new JDialog(new JFrame());
+                JDialog jDialog = new JDialog((Dialog) null);
                 finalB.setEnabled(false);
                 JLabel label = new JLabel("Enter magnet link below:");
                 JTextArea textArea = new JTextArea();

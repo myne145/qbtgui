@@ -24,7 +24,7 @@ public class TorrentListThread extends Thread {
     private DefaultTableModel model;
     private JComboBox spinner;
 
-    private String speedUnitSymbol;
+    private ArrayList<String> speedUnitSymbol = new ArrayList<>();
     public TorrentListThread(DefaultTableModel model, int unitIndex, JButton j, JComboBox jsp) {
         this.unitIndex = unitIndex;
         this.model = model;
@@ -70,7 +70,7 @@ public class TorrentListThread extends Thread {
             try {
                 data = new JSONObject(splitData.get(i));
             } catch(Exception e) {
-                Gui.alert(AlertType.ERROR, e.getMessage() + "\n whatever that means");
+                Gui.alert(AlertType.ERROR, e.getLocalizedMessage() + "\n whatever that means");
             }
             this.names.add(data.getString("name"));
             this.sizes.add((double) data.getLong("size")); //ALWAYS returns bytes
@@ -118,12 +118,15 @@ public class TorrentListThread extends Thread {
     private void convertSpeedvalue() {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         for(int i = 0; i < speeds.size(); i++) {
-            if(speeds.get(i) > 1048576) {
-                speedUnitSymbol = "mb";
+            if(speeds.get(i) >= 1048576) {
+                speedUnitSymbol.add("mb");
                 speeds.set(i, Double.valueOf(decimalFormat.format(speeds.get(i) / Math.pow(1024, 2))));
             } else if(speeds.get(i) < 1048576 && speeds.get(i) > 0) {
-                speedUnitSymbol = "kb";
+                speedUnitSymbol.add("kb");
                 speeds.set(i, Double.valueOf(decimalFormat.format(speeds.get(i) / 1024)));
+            }
+            else {
+                speedUnitSymbol.add("kb");
             }
         }
         //speeds.replaceAll(decimalFormat.format());
@@ -153,7 +156,7 @@ public class TorrentListThread extends Thread {
             //spinner.setEnabled(false);
             for(int i = 0; i < names.size(); i++) {
                 if(!names.get(i).isEmpty())
-                    model.addRow(new String[]{names.get(i),progressConverter().get(i), String.valueOf(speeds.get(i)) + speedUnitSymbol, sizes.get(i) + unitSymbol});
+                    model.addRow(new String[]{names.get(i),progressConverter().get(i), speeds.get(i) + speedUnitSymbol.get(i), sizes.get(i) + unitSymbol});
                 //System.out.println(names.get(i) + "\t" + sizes.get(i) + unitSymbol + "\t" + progresses.get(i));
             }
             g.isThreadRunning = false;
