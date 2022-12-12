@@ -16,15 +16,20 @@ public class TorrentListThread extends Thread {
     private ArrayList<BigDecimal> progresses = new ArrayList<>();
     private ArrayList<Double> sizes = new ArrayList<>();
     private ArrayList<String> hashes = new ArrayList<>();
+    private ArrayList<Double> speeds = new ArrayList<>();
     private String unitSymbol;
     public static boolean isReady = false;
     private JButton guiButton;
     private int unitIndex;
     private DefaultTableModel model;
-    public TorrentListThread(DefaultTableModel model, int unitIndex, JButton j) {
+    private JComboBox spinner;
+
+    private String speedUnitSymbol;
+    public TorrentListThread(DefaultTableModel model, int unitIndex, JButton j, JComboBox jsp) {
         this.unitIndex = unitIndex;
         this.model = model;
         this.guiButton = j;
+        this.spinner = jsp;
     }
     private OutputStream refreshTorrentList() throws IOException {
         //stackoverflow code
@@ -71,9 +76,10 @@ public class TorrentListThread extends Thread {
             this.sizes.add((double) data.getLong("size")); //ALWAYS returns bytes
             this.hashes.add(data.getString("hash"));
             this.progresses.add(data.getBigDecimal("progress"));
+            this.speeds.add(data.getDouble("dlspeed"));
         }
     }
-
+    //SPEED IS IN BYTES!!!
     private void unitConversion() {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         System.out.println("Index :" + unitIndex);
@@ -109,6 +115,19 @@ public class TorrentListThread extends Thread {
         return arr;
     }
 
+    private void convertSpeedvalue() {
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        for(int i = 0; i < speeds.size(); i++) {
+            if(speeds.get(i) > 1048576) {
+                speedUnitSymbol = "mb";
+                speeds.set(i, Double.valueOf(decimalFormat.format(speeds.get(i) / Math.pow(1024, 2))));
+            } else if(speeds.get(i) < 1048576 && speeds.get(i) > 0) {
+                speedUnitSymbol = "kb";
+                speeds.set(i, Double.valueOf(decimalFormat.format(speeds.get(i) / 1024)));
+            }
+        }
+        //speeds.replaceAll(decimalFormat.format());
+    }
 
 
     @Override
@@ -118,6 +137,7 @@ public class TorrentListThread extends Thread {
             Gui g = new Gui();
             processTorrentData();
             unitConversion();
+            convertSpeedvalue();
             DefaultTableModel d = new DefaultTableModel();
             //g.torrentListTable.setModel(d);
 
@@ -130,14 +150,16 @@ public class TorrentListThread extends Thread {
 //                sizes.clear();
 //                processTorrentData();
 //             }
+            //spinner.setEnabled(false);
             for(int i = 0; i < names.size(); i++) {
                 if(!names.get(i).isEmpty())
-                    model.addRow(new String[]{names.get(i),progressConverter().get(i), sizes.get(i) + unitSymbol});
+                    model.addRow(new String[]{names.get(i),progressConverter().get(i), String.valueOf(speeds.get(i)) + speedUnitSymbol, sizes.get(i) + unitSymbol});
                 //System.out.println(names.get(i) + "\t" + sizes.get(i) + unitSymbol + "\t" + progresses.get(i));
             }
+            g.isThreadRunning = false;
+            g.b.setEnabled(true);
             guiButton.setEnabled(true);
-            g.selectUnit.setEnabled(true);
-            g.selectUnitText.setEnabled(true);
+            spinner.setEnabled(true);
             progressConverter();
         } catch (Exception e) {
             Gui.alert(AlertType.ERROR, e.getLocalizedMessage());

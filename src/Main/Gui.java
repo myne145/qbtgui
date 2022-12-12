@@ -36,6 +36,7 @@ public class Gui extends JPanel {
     public final JLabel selectUnitText = new JLabel("Select displayed unit:");
     public static int unitIndex;
     private final JLabel refreshingPlsWait = new JLabel("Refreshing Torrents, Please Wait...");
+    JButton b;
     public DefaultTableModel torrentListModel = new DefaultTableModel() {
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -47,9 +48,11 @@ public class Gui extends JPanel {
     JToolBar tb = new JToolBar();
     JScrollPane scrollTest = new JScrollPane(torrentListTable);
 
+    JButton finalB;
 
-    private void startThread(JButton j) {
-        TorrentListThread thread = new TorrentListThread(torrentListModel, unitIndex, j);
+    public boolean isThreadRunning = false;
+    private void startThread(JButton j, JComboBox<String> jsp) {
+        TorrentListThread thread = new TorrentListThread(torrentListModel, unitIndex, j, jsp);
 
 
         if(torrentListTable.getRowCount() > 1) {
@@ -76,8 +79,9 @@ public class Gui extends JPanel {
         selectUnit.setEditable(false);
         torrentListModel.addColumn("name");
         torrentListModel.addColumn("progress");
+        torrentListModel.addColumn("speed");
         torrentListModel.addColumn("size");
-        torrentListModel.addRow(new String[]{"Filename","Progress","Size"});
+        torrentListModel.addRow(new String[]{"Filename","Progress","Speed","Size"});
         torrentListTable.setBorder(new FlatRoundBorder());
         list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableModel.addColumn("Test");
@@ -92,7 +96,10 @@ public class Gui extends JPanel {
         selectUnit.addItemListener(event -> {
             if(event.getStateChange() == ItemEvent.SELECTED) {
                 unitIndex = selectUnit.getSelectedIndex();
-                startThread(new JButton());
+                selectUnit.setEnabled(false);
+                b.setEnabled(false);
+                isThreadRunning = true; //the worst solution ever, if I add even one more jbutton to the toolbar, it's gonna break af
+                startThread(b, selectUnit);
             }
         });
         add(selectUnitText);
@@ -131,9 +138,9 @@ public class Gui extends JPanel {
                 try {
                     List<File> l = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
                     for (File f : l) {
-                        if(getFileExtension(f).equals(".torrent") || !listModel.contains(f.toString())) {
-                            listModel.add(listModel.size(), f.getName());
+                        if(!fileList.contains(f)) {
                             fileList.add(f);
+                            listModel.add(listModel.size(), f.getName());
                         } else {
                             listModel.add(listModel.size(), "File is not a torrent!");
                         }
@@ -159,6 +166,8 @@ public class Gui extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+//        if(isThreadRunning)
+//            b.setEnabled(false);
         //torrentListModel.addRow(new String[]{"test","test2","test3"});
         torrentListTable.setBounds(getWidth() / 2 - 40, 40, getWidth() / 2 + 20,getHeight() - 90);
         list.setBounds(0,40,getWidth() / 2 - 50, getHeight() - 90);
@@ -184,8 +193,8 @@ public class Gui extends JPanel {
         return false;
     }
 
+
     public JToolBar createDummyToolBar() {
-        JButton b;
         b = new JButton("Open Files");
         b.setRequestFocusEnabled(false);
         b.setPreferredSize(new Dimension(100,30));
@@ -219,7 +228,8 @@ public class Gui extends JPanel {
         tb.add(b);
         b = new JButton("Add Magnet Link");
         b.setRequestFocusEnabled(false);
-        JButton finalB = b;
+//        JButton finalB = b;
+        finalB = b;
         b.addActionListener(e-> {
                 JDialog jDialog = new JDialog(new JFrame());
                 finalB.setEnabled(false);
@@ -293,8 +303,8 @@ public class Gui extends JPanel {
         b.addActionListener(e-> {
             finalB1.setEnabled(false);
             selectUnit.setEnabled(false);
-            selectUnitText.setEnabled(false);
-            startThread(finalB1);
+            //selectUnitText.setEnabled(false);
+            startThread(finalB1, selectUnit);
             });
         tb.add(b);
         tb.setFloatable(false);
