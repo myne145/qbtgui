@@ -5,8 +5,8 @@ import javax.swing.*;
 import static Main.Gui.alert;
 
 public class StartTheDownloadThread extends Thread {
-    private DefaultListModel listModel;
-    public StartTheDownloadThread(DefaultListModel l) {
+    private final DefaultListModel<Object> listModel;
+    public StartTheDownloadThread(DefaultListModel<Object> l) {
         this.listModel = l;
     }
 

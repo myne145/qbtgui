@@ -9,32 +9,29 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 
 public class TorrentListThread extends Thread {
     public ArrayList<String> names = new ArrayList<>();
-    private ArrayList<BigDecimal> progresses = new ArrayList<>();
-    private ArrayList<Double> sizes = new ArrayList<>();
-    private ArrayList<String> hashes = new ArrayList<>();
-    private ArrayList<Double> speeds = new ArrayList<>();
+    private final ArrayList<BigDecimal> progresses = new ArrayList<>();
+    private final ArrayList<Double> sizes = new ArrayList<>();
+    private final ArrayList<String> hashes = new ArrayList<>();
+    private final ArrayList<Double> speeds = new ArrayList<>();
     private String unitSymbol;
-    public static boolean isReady = false;
-    private JButton guiButton;
+    private final JButton guiButton;
     private int unitIndex;
     private DefaultTableModel model;
-    private JComboBox spinner;
+    private JComboBox<String> spinner;
 
     private ArrayList<String> speedUnitSymbol = new ArrayList<>();
-    public TorrentListThread(DefaultTableModel model, int unitIndex, JButton j, JComboBox jsp) {
+    public TorrentListThread(DefaultTableModel model, int unitIndex, JButton j, JComboBox<String> jsp) {
         this.unitIndex = unitIndex;
         this.model = model;
         this.guiButton = j;
         this.spinner = jsp;
     }
     private OutputStream refreshTorrentList() throws IOException {
-        //stackoverflow code
         OutputStream output = new OutputStream() {
-            StringBuilder string = new StringBuilder();
+            final StringBuilder string = new StringBuilder();
 
             @Override
             public void write(int b) {
@@ -48,7 +45,6 @@ public class TorrentListThread extends Thread {
         Process p = Runtime.getRuntime().exec(".\\qbt\\qbt torrent list --format json");
         p.getInputStream().transferTo(output);
         p.getErrorStream().transferTo(output);
-        //System.out.println(output);
         return output;
     }
 
@@ -58,7 +54,7 @@ public class TorrentListThread extends Thread {
             if(i != split.length - 1)
                 split[i] = split[i] + "\t" + "}";
             split[i] = split[i].replaceAll("\\[", "");
-            split[i] = split[i].replaceAll("\\]", "");
+            split[i] = split[i].replaceAll("]", "");
 
         }
         return new ArrayList<>(Arrays.asList(split));
@@ -82,7 +78,6 @@ public class TorrentListThread extends Thread {
     //SPEED IS IN BYTES!!!
     private void unitConversion() {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        System.out.println("Index :" + unitIndex);
         switch(unitIndex) {
             case 0 -> {
                 sizes.replaceAll(aLong -> Double.valueOf(decimalFormat.format(aLong / 1024)));
@@ -119,17 +114,16 @@ public class TorrentListThread extends Thread {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         for(int i = 0; i < speeds.size(); i++) {
             if(speeds.get(i) >= 1048576) {
-                speedUnitSymbol.add("mb");
+                speedUnitSymbol.add("mb/s");
                 speeds.set(i, Double.valueOf(decimalFormat.format(speeds.get(i) / Math.pow(1024, 2))));
             } else if(speeds.get(i) < 1048576 && speeds.get(i) > 0) {
-                speedUnitSymbol.add("kb");
+                speedUnitSymbol.add("kb/s");
                 speeds.set(i, Double.valueOf(decimalFormat.format(speeds.get(i) / 1024)));
             }
             else {
-                speedUnitSymbol.add("kb");
+                speedUnitSymbol.add("kb/s");
             }
         }
-        //speeds.replaceAll(decimalFormat.format());
     }
 
 
@@ -141,23 +135,9 @@ public class TorrentListThread extends Thread {
             processTorrentData();
             unitConversion();
             convertSpeedvalue();
-            DefaultTableModel d = new DefaultTableModel();
-            //g.torrentListTable.setModel(d);
-
-//            g.torrentListModel.addRow(new String[]{"test","test1","test2"});
-//            g.torrentListModel.fireTableDataChanged();
-            //isReady = true;
-//            if(!names.isEmpty() || !progressConverter().isEmpty() || !sizes.isEmpty()) {
-//                names.clear();
-//                progressConverter().clear();
-//                sizes.clear();
-//                processTorrentData();
-//             }
-            //spinner.setEnabled(false);
             for(int i = 0; i < names.size(); i++) {
                 if(!names.get(i).isEmpty())
                     model.addRow(new String[]{names.get(i),progressConverter().get(i), speeds.get(i) + speedUnitSymbol.get(i), sizes.get(i) + unitSymbol});
-                //System.out.println(names.get(i) + "\t" + sizes.get(i) + unitSymbol + "\t" + progresses.get(i));
             }
             g.isThreadRunning = false;
             g.b.setEnabled(true);

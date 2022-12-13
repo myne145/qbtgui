@@ -4,6 +4,7 @@ import org.json.*;
 
 import java.awt.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -19,7 +20,7 @@ public class Config {
     public int windowSizeX;
     public int windowSizeY;
 
-    String content = Files.readString(Paths.get("config.json"));;
+    String content = Files.readString(Paths.get("config.json"));
     JSONObject j = new JSONObject(content);
 
     public Config() throws IOException {
@@ -42,15 +43,9 @@ public class Config {
         j.put("windowSizeX", windowSize.width);
         j.put("windowSizeY", windowSize.height);
         //fuck me
-        PrintWriter writer = new PrintWriter("config.json", "UTF-8");
+        PrintWriter writer = new PrintWriter("config.json", StandardCharsets.UTF_8);
         writer.println(j);
         writer.close();
         //fileWriter.write(j.toString());
     }
-
-    public void saveValues() {
-        this.launchPosX = j.getInt("lastLaunchedPosX");
-        this.launchPosY = j.getInt("lastLaunchedPosY");
-    }
-
 }

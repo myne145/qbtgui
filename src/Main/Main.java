@@ -8,19 +8,29 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 
+import static Main.Gui.alert;
+
 public class Main {
     public static void main(String[] args) throws IOException {
         Config cfg = new Config();
+        ImageIcon iconImg = new ImageIcon(".\\qbtapiicon.png");
         FlatDarkLaf.setup();
-        Gui gui = new Gui();
         JFrame window = new JFrame();
         window.add(new Gui());
         window.setVisible(true);
         window.setLocation(cfg.launchPosX, cfg.launchPosY);
         window.pack();
-        //window.setJMenuBar(gui.createDummyMenuBar());
         window.setTitle("Qbittorrent WebUI Downloader");
         window.setPreferredSize(new Dimension(1000, 600));
+        window.setIconImage(iconImg.getImage());
+
+        try {
+            QBitAPI.initiateConnection();
+        } catch (Exception e) {
+            alert(AlertType.FATAL, "Cannot connect to server \n" + e.getLocalizedMessage());
+            System.exit(0);
+        }
+
         window.addWindowListener(new WindowListener() {
             @Override
             public void windowOpened(WindowEvent e) {}
@@ -29,7 +39,7 @@ public class Main {
                 try {
                     cfg.saveValues(window.getX(), window.getY(), new Dimension(window.getWidth(), window.getHeight()));
                 } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                    alert(AlertType.ERROR, "Cannot save values to config \n" + ex.getLocalizedMessage());
                 }
             }
             @Override
@@ -42,11 +52,6 @@ public class Main {
             public void windowActivated(WindowEvent e) {}
             @Override
             public void windowDeactivated(WindowEvent e) {}
-        });
-        QBitAPI.initializeConfigFile();
-        SwingUtilities.invokeLater(() -> {
-            UIManager.put("swing.boldMetal", Boolean.FALSE);
-            Gui.createAndShowGUI();
         });
     }
 }

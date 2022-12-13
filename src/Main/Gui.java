@@ -1,7 +1,5 @@
 package Main;
 
-
-import com.formdev.flatlaf.ui.FlatFileChooserUI;
 import com.formdev.flatlaf.ui.FlatRoundBorder;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -15,14 +13,7 @@ import java.util.List;
 
 public class Gui extends JPanel {
 
-    public static void alert(AlertType alertType, String message) {
-        switch(alertType) {
-            case INFO -> JOptionPane.showMessageDialog(null, message, "Information", JOptionPane.INFORMATION_MESSAGE);
-            case ERROR -> JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
-            case WARNING -> JOptionPane.showMessageDialog(null, message, "Warning", JOptionPane.WARNING_MESSAGE);
-            case FATAL -> JOptionPane.showMessageDialog(null, message, "Fatal Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+
 
     private final DefaultListModel<Object> listModel = new DefaultListModel<>();
     private final JList<Object> list = new JList<>(listModel);
@@ -35,8 +26,7 @@ public class Gui extends JPanel {
     public final JComboBox<String> selectUnit = new JComboBox<>();
     public final JLabel selectUnitText = new JLabel("Select displayed unit:");
     public static int unitIndex;
-    private final JLabel refreshingPlsWait = new JLabel("Refreshing Torrents, Please Wait...");
-    JButton b;
+    public JButton b;
     public DefaultTableModel torrentListModel = new DefaultTableModel() {
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -45,11 +35,11 @@ public class Gui extends JPanel {
         }
     };
     public JTable torrentListTable = new JTable(torrentListModel);
-    JToolBar tb = new JToolBar();
-    JScrollPane scrollTest = new JScrollPane(torrentListTable);
+    private final JToolBar tb = new JToolBar();
+    private final JScrollPane scrollTest = new JScrollPane(torrentListTable);
 
     JButton finalB;
-    private JScrollPane listScrollPane = new JScrollPane();
+    private final JScrollPane listScrollPane = new JScrollPane();
 
     public boolean isThreadRunning = false;
     private void startThread(JButton j, JComboBox<String> jsp) {
@@ -70,6 +60,14 @@ public class Gui extends JPanel {
         return name.substring(lastIndexOf);
     }
 
+    public static void alert(AlertType alertType, String message) {
+        switch(alertType) {
+            case INFO -> JOptionPane.showMessageDialog(null, message, "Information", JOptionPane.INFORMATION_MESSAGE);
+            case ERROR -> JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+            case WARNING -> JOptionPane.showMessageDialog(null, message, "Warning", JOptionPane.WARNING_MESSAGE);
+            case FATAL -> JOptionPane.showMessageDialog(null, message, "Fatal Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
 
     public Gui() {
@@ -82,6 +80,8 @@ public class Gui extends JPanel {
         torrentListModel.addColumn("progress");
         torrentListModel.addColumn("speed");
         torrentListModel.addColumn("size");
+
+        torrentListTable.getColumn("name").setPreferredWidth(200);
         torrentListModel.addRow(new String[]{"Filename","Progress","Speed","Size"});
         torrentListTable.setBorder(new FlatRoundBorder());
         list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -110,7 +110,6 @@ public class Gui extends JPanel {
         add(selectUnit);
         add(torrentListTable);
         add(list);
-        add(refreshingPlsWait);
         add(scrollTest, BorderLayout.CENTER);
         add(createDummyToolBar(), BorderLayout.NORTH);
         add(createDummyMenuBar(), BorderLayout.NORTH);
@@ -142,13 +141,12 @@ public class Gui extends JPanel {
                 try {
                     List<File> l = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
                     for (File f : l) {
-                        if(!fileList.contains(f)) {
+                        if(getFileExtension(f).equals(".torrent")) {
                             fileList.add(f);
                             listModel.add(listModel.size(), f.getName());
                         } else {
                             listModel.add(listModel.size(), "File is not a torrent!");
                         }
-                        //System.out.println(f);
                     }
                     QBitAPI.files.addAll(fileList);
                 } catch (UnsupportedFlavorException | IOException e) {
@@ -170,33 +168,12 @@ public class Gui extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-//        if(isThreadRunning)
-//            b.setEnabled(false);
-        //torrentListModel.addRow(new String[]{"test","test2","test3"});
-        torrentListTable.setBounds(getWidth() / 2 - 40, 40, getWidth() / 2 + 20,getHeight() - 90);
+        torrentListTable.setBounds(getWidth() / 2 - 40, 40, getWidth() / 2 + 40,getHeight() - 90);
         list.setBounds(0,40,getWidth() / 2 - 50, getHeight() - 90);
-        refreshingPlsWait.setBounds(getWidth() - 250,getHeight() - 40,230,20);
         selectUnit.setBounds(130,getHeight() - 40,60,20);
         selectUnitText.setBounds(10,getHeight() - 40,130,20);
         tb.setBounds(0,0,getWidth(),40);
     }
-
-    public static void createAndShowGUI() {
-        try {
-            System.out.println(QBitAPI.initiateConnection());
-        } catch (Exception e) {
-            alert(AlertType.FATAL, "Cannot connect to server - IOException");
-            System.exit(0);
-        }
-    }
-
-    public static boolean isEmpty(JTable jTable) {
-        if (jTable != null && jTable.getModel() != null) {
-            return jTable.getModel().getRowCount() <= 0;
-        }
-        return false;
-    }
-
 
     public JToolBar createDummyToolBar() {
         b = new JButton("Open Files");
@@ -205,6 +182,7 @@ public class Gui extends JPanel {
 
         b.addActionListener(e -> {
             fileDialog.setMultipleMode(true);
+
             fileDialog.setVisible(true);
             File[] files = fileDialog.getFiles();
             ArrayList<File> arr = new ArrayList<>();
@@ -264,9 +242,7 @@ public class Gui extends JPanel {
                             listModel.remove(0);
                         listModel.add(listModel.size(), "Magnet Link");
                     } else {
-                        finalB.setEnabled(true);
-                        JOptionPane.showMessageDialog(null, "Magnet link specified is invalid", "Invalid magnet link",
-                                JOptionPane.ERROR_MESSAGE);
+                        alert(AlertType.ERROR, "Magnet link is invalid");
                     }
                 });
                 jDialog.addWindowListener(new WindowListener() {
@@ -302,7 +278,7 @@ public class Gui extends JPanel {
         });
         tb.add(b);
         b = new JButton("Show Currently Downloading Torrents");
-        b.setRequestFocusEnabled(false); //TODO: cooldown crashing th app and server
+        b.setRequestFocusEnabled(false);
         JButton finalB1 = b;
         b.addActionListener(e-> {
             finalB1.setEnabled(false);
