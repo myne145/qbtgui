@@ -37,7 +37,7 @@ public class Main {
             @Override
             public void windowClosing(WindowEvent e) {
                 try {
-                    cfg.saveValues(window.getX(), window.getY(), new Dimension(window.getWidth(), window.getHeight()));
+                    cfg.saveValues(window.getX(), window.getY());
                 } catch (IOException ex) {
                     alert(AlertType.ERROR, "Cannot save values to config \n" + ex.getLocalizedMessage());
                 }

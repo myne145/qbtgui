@@ -14,15 +14,15 @@ public class TorrentListThread extends Thread {
     public ArrayList<String> names = new ArrayList<>();
     private final ArrayList<BigDecimal> progresses = new ArrayList<>();
     private final ArrayList<Double> sizes = new ArrayList<>();
-    private final ArrayList<String> hashes = new ArrayList<>();
+    private final ArrayList<String> hashes = new ArrayList<>(); //future functionalities ;)
     private final ArrayList<Double> speeds = new ArrayList<>();
     private String unitSymbol;
     private final JButton guiButton;
-    private int unitIndex;
-    private DefaultTableModel model;
-    private JComboBox<String> spinner;
+    private final int unitIndex;
+    private final DefaultTableModel model;
+    private final JComboBox<String> spinner;
 
-    private ArrayList<String> speedUnitSymbol = new ArrayList<>();
+    private final ArrayList<String> speedUnitSymbol = new ArrayList<>();
     public TorrentListThread(DefaultTableModel model, int unitIndex, JButton j, JComboBox<String> jsp) {
         this.unitIndex = unitIndex;
         this.model = model;
@@ -61,11 +61,11 @@ public class TorrentListThread extends Thread {
     }
     private void processTorrentData() throws IOException {
         ArrayList<String> splitData = splitJsons();
-        for(int i = 0; i < splitData.size(); i++) {
+        for (String splitDatum : splitData) {
             JSONObject data = new JSONObject();
             try {
-                data = new JSONObject(splitData.get(i));
-            } catch(Exception e) {
+                data = new JSONObject(splitDatum);
+            } catch (Exception e) {
                 Gui.alert(AlertType.ERROR, e.getLocalizedMessage() + "\n whatever that means");
             }
             this.names.add(data.getString("name"));
@@ -96,12 +96,12 @@ public class TorrentListThread extends Thread {
 
     private ArrayList<String> progressConverter() {
         ArrayList<String> arr = new ArrayList<>();
-        for(int i = 0; i < progresses.size(); i++) {
+        for (BigDecimal progress : progresses) {
             int progressPerrcentage = 100;
-            if(progresses.get(i).toString().length() >= 4)
-                progressPerrcentage = Integer.parseInt(progresses.get(i).toString().substring(2,4));
+            if (progress.toString().length() >= 4)
+                progressPerrcentage = Integer.parseInt(progress.toString().substring(2, 4));
 
-            if(progresses.get(i).toString().charAt(0) == '1')
+            if (progress.toString().charAt(0) == '1')
                 progressPerrcentage = 100;
 
             arr.add(progressPerrcentage + "%");

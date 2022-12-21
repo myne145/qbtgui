@@ -24,7 +24,7 @@ public class Gui extends JPanel {
     private final static int scrY = scrRes.height;
     private final DefaultTableModel tableModel = new DefaultTableModel();
     public final JComboBox<String> selectUnit = new JComboBox<>();
-    public final JLabel selectUnitText = new JLabel("Select displayed unit:");
+    public final JLabel selectUnitText = new JLabel("Select display unit:");
     public static int unitIndex;
     public JButton b;
     public DefaultTableModel torrentListModel = new DefaultTableModel() {
@@ -81,7 +81,11 @@ public class Gui extends JPanel {
         torrentListModel.addColumn("speed");
         torrentListModel.addColumn("size");
 
-        torrentListTable.getColumn("name").setPreferredWidth(200);
+        torrentListTable.getColumn("progress").setPreferredWidth(30);
+        torrentListTable.getColumn("name").setPreferredWidth(250);
+        torrentListTable.getColumn("size").setPreferredWidth(75);
+        torrentListTable.getColumn("speed").setPreferredWidth(75);
+
         torrentListModel.addRow(new String[]{"Filename","Progress","Speed","Size"});
         torrentListTable.setBorder(new FlatRoundBorder());
         list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -96,6 +100,13 @@ public class Gui extends JPanel {
         unitIndex = 1;
         selectUnit.addItemListener(event -> {
             if(event.getStateChange() == ItemEvent.SELECTED) {
+                Config config;
+                try {
+                    config = new Config();
+                    config.saveValues();
+                } catch (IOException e) {
+                    alert(AlertType.ERROR, Arrays.toString(e.getStackTrace()));
+                }
                 unitIndex = selectUnit.getSelectedIndex();
                 selectUnit.setEnabled(false);
                 b.setEnabled(false);
@@ -168,9 +179,9 @@ public class Gui extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        torrentListTable.setBounds(getWidth() / 2 - 40, 40, getWidth() / 2 + 40,getHeight() - 90);
-        list.setBounds(0,40,getWidth() / 2 - 50, getHeight() - 90);
-        selectUnit.setBounds(130,getHeight() - 40,60,20);
+        torrentListTable.setBounds(getWidth() / 2 - 40, 40, getWidth() / 2 + 35,getHeight() - 90);
+        list.setBounds(5,40,getWidth() / 2 - 55, getHeight() - 90);
+        selectUnit.setBounds(120,getHeight() - 40,60,20);
         selectUnitText.setBounds(10,getHeight() - 40,130,20);
         tb.setBounds(0,0,getWidth(),40);
     }
@@ -188,12 +199,14 @@ public class Gui extends JPanel {
             ArrayList<File> arr = new ArrayList<>();
             for (File file : files) {
                 if(getFileExtension(file).equals(".torrent")) {
-                    listModel.add(listModel.size(), file);
+                    listModel.add(listModel.size(), file.getName());
                     arr.add(file);
                 } else {
                     listModel.add(listModel.size(), "File is not a Torrent!");
                 }
             }
+            if(listModel.get(0).equals("Drop Files Here"))
+                listModel.remove(0);
             QBitAPI.files.addAll(arr);
         });
         tb.add(b);
@@ -215,20 +228,30 @@ public class Gui extends JPanel {
         b.addActionListener(e-> {
                 JDialog jDialog = new JDialog((Dialog) null);
                 finalB.setEnabled(false);
-                JLabel label = new JLabel("Enter magnet link below:");
+                jDialog.setIconImage(new ImageIcon(".\\qbtapiicon.png").getImage());
+                JLabel label = new JLabel("Enter magnet link below (max one link!)");
+                label.putClientProperty("FlatLaf.styleClass", "h3");
                 JTextArea textArea = new JTextArea();
+                JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
                 JButton ok = new JButton("Ok");
+                JButton cancel = new JButton("Cancel");
                 jDialog.setPreferredSize(new Dimension(400, 500));
                 jDialog.setLocation(scrX / 2 - 200, scrY / 2 - 250);
                 jDialog.pack();
                 jDialog.setLayout(null);
-                jDialog.setTitle("Enter Magnet Link (ONLY 1 MAGNET LINK FOR NOW)");
+                jDialog.setTitle("Enter Magnet Link");
                 jDialog.setResizable(false);
-                label.setBounds(0, 10, 200, 30);
-                textArea.setBounds(0, 50, jDialog.getWidth(), 300);
+                label.setBounds(25, 10, 280, 30);
+                textArea.setBounds(15, 50, 355, 330);
+                separator.setBounds(0, 400, 400, 10);
                 textArea.setLineWrap(true);
                 textArea.setBorder(new FlatRoundBorder());
-                ok.setBounds(300, 400, 70, 30);
+                ok.setBounds(215, 425, 80, 24);
+                cancel.setBounds(300, 425, 80, 24);
+                cancel.addActionListener(eee -> {
+                    jDialog.setVisible(false);
+                    finalB.setEnabled(true);
+                });
                 ok.addActionListener(ee -> {
                     if (!textArea.getText().equals("")) {
                         String text = textArea.getText();
@@ -236,7 +259,6 @@ public class Gui extends JPanel {
                         QBitAPI.magnetLinks.addAll(Arrays.asList(magnetSplitted));
                         QBitAPI.magnetLinks.replaceAll(s -> s.replace("\n", ""));
                         finalB.setEnabled(true);
-                        //QBitAPI.magnetLinks.add(textArea.getText()); //TODO: add more than 1 link
                         jDialog.setVisible(false);
                         if (listModel.get(0).equals("Drop Files Here"))
                             listModel.remove(0);
@@ -263,7 +285,8 @@ public class Gui extends JPanel {
                     @Override
                     public void windowDeactivated(WindowEvent e) {}
                 });
-
+                jDialog.add(cancel);
+                jDialog.add(separator);
                 jDialog.add(ok);
                 jDialog.add(textArea);
                 jDialog.add(label);
