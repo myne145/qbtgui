@@ -1,6 +1,9 @@
 package Main;
 
+import cf.vbnm.filechooser4j.FileChooser;
 import com.formdev.flatlaf.ui.FlatRoundBorder;
+import jnafilechooser.api.JnaFileChooser;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -13,7 +16,13 @@ import java.util.List;
 
 public class Gui extends JPanel {
 
-
+    public DefaultTableModel torrentListModel = new DefaultTableModel() {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            //all cells false
+            return false;
+        }
+    };
 
     private final DefaultListModel<Object> listModel = new DefaultListModel<>();
     private final JList<Object> list = new JList<>(listModel);
@@ -27,13 +36,7 @@ public class Gui extends JPanel {
     public final JLabel selectUnitText = new JLabel("Select display unit:");
     public static int unitIndex;
     public JButton b;
-    public DefaultTableModel torrentListModel = new DefaultTableModel() {
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            //all cells false
-            return false;
-        }
-    };
+    private JFrame parentFrame;
     public JTable torrentListTable = new JTable(torrentListModel);
     private final JToolBar tb = new JToolBar();
     private final JScrollPane scrollTest = new JScrollPane(torrentListTable);
@@ -51,6 +54,7 @@ public class Gui extends JPanel {
         }
         thread.start();
     }
+    public static final JButton startTheDownload = new JButton("Start downloading");
     private static String getFileExtension(File file) {
         String name = file.getName();
         int lastIndexOf = name.lastIndexOf(".");
@@ -69,8 +73,12 @@ public class Gui extends JPanel {
         }
     }
 
-
     public Gui() {
+        createDummyToolBar();
+    }
+
+    public Gui(JFrame frame) {
+        parentFrame = frame;
         this.setLayout(null);
         scrollTest.setEnabled(true);
         scrollTest.setVisible(true);
@@ -124,8 +132,24 @@ public class Gui extends JPanel {
         add(scrollTest, BorderLayout.CENTER);
         add(createDummyToolBar(), BorderLayout.NORTH);
         add(createDummyMenuBar(), BorderLayout.NORTH);
+        add(startTheDownload);
+        //selectUnitText.putClientProperty("FlatLaf.styleClass", "h4");
+        //getRootPane().setDefaultButton(startTheDownload);
+
+        startTheDownload.addActionListener(e -> {
+            StartTheDownloadThread s = new StartTheDownloadThread(listModel);
+            s.start();
+//            JnaFileChooser fc = new JnaFileChooser();
+//            fc.addFilter("All Files", "*");
+//            fc.addFilter("Pictures", "jpg", "jpeg", "png", "gif", "bmp");
+//            fc.setMultiSelectionEnabled(true);
+//            if(fc.showOpenDialog(parentFrame)) {
+//                File f = fc.getSelectedFile();
+//                System.out.println(f);
+//            }
 
 
+        });
         TransferHandler handler = new TransferHandler() {
             public boolean canImport(TransferSupport support) {
                 if (!support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
@@ -184,6 +208,7 @@ public class Gui extends JPanel {
         selectUnit.setBounds(120,getHeight() - 40,60,20);
         selectUnitText.setBounds(10,getHeight() - 40,130,20);
         tb.setBounds(0,0,getWidth(),40);
+        startTheDownload.setBounds(getWidth() - 135, getHeight() - 40, 125, 30);
     }
 
     public JToolBar createDummyToolBar() {
@@ -192,22 +217,41 @@ public class Gui extends JPanel {
         b.setPreferredSize(new Dimension(100,30));
 
         b.addActionListener(e -> {
-            fileDialog.setMultipleMode(true);
 
-            fileDialog.setVisible(true);
-            File[] files = fileDialog.getFiles();
-            ArrayList<File> arr = new ArrayList<>();
-            for (File file : files) {
-                if(getFileExtension(file).equals(".torrent")) {
-                    listModel.add(listModel.size(), file.getName());
-                    arr.add(file);
-                } else {
-                    listModel.add(listModel.size(), "File is not a Torrent!");
-                }
+            final FileChooser fileChooser = new FileChooser();
+            fileChooser.setReadonly(true);
+            fileChooser.setFilenameFilter(".torrent files\u0000*.torrent\u0000\u0000");
+            fileChooser.setTitle("Open torrent files");
+            fileChooser.setFlags(fileChooser.getFlags() | FileChooser.OFN_ALLOWMULTISELECT);
+            try {
+                fileChooser.openFileName();
+            } catch (Exception ignored) {
+
             }
+            fileChooser.getErrorCode();
+            fileChooser.getPaths();
+            System.out.println(Arrays.toString(fileChooser.getPaths()));
+
+
+
+//            fileDialog.setMultipleMode(true);
+//
+//            fileDialog.setVisible(true);
+//            File[] files = fileDialog.getFiles();
+//            ArrayList<File> arr = new ArrayList<>();
+//            for (File file : files) {
+//                if(getFileExtension(file).equals(".torrent")) {
+//                    listModel.add(listModel.size(), file.getName());
+//                    arr.add(file);
+//                    System.out.println(file);
+//                } else {
+//                    listModel.add(listModel.size(), "File is not a Torrent!");
+//                }
+         //   }
             if(listModel.get(0).equals("Drop Files Here"))
                 listModel.remove(0);
-            QBitAPI.files.addAll(arr);
+            for(String s : fileChooser.getPaths())
+                QBitAPI.files.add(new File(s)); //the most lazy solution
         });
         tb.add(b);
         b = new JButton("Clear All Files");
@@ -293,13 +337,13 @@ public class Gui extends JPanel {
                 jDialog.setVisible(true);
         });
         tb.add(b);
-        b = new JButton("Start the download on server");
-        b.setRequestFocusEnabled(false);
-        b.addActionListener(e-> {
-            StartTheDownloadThread s = new StartTheDownloadThread(listModel);
-            s.start();
-        });
-        tb.add(b);
+//        b = new JButton("Start the download on server");
+//        b.setRequestFocusEnabled(false);
+//        b.addActionListener(e-> {
+////            StartTheDownloadThread s = new StartTheDownloadThread(listModel);
+////            s.start();
+//        });
+//        tb.add(b);
         b = new JButton("Show Currently Downloading Torrents");
         b.setRequestFocusEnabled(false);
         JButton finalB1 = b;

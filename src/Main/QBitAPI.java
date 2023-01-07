@@ -1,6 +1,8 @@
 package Main;
 
 import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 
 
@@ -49,13 +51,13 @@ public class QBitAPI {
         return output;
     }
 
-    public static String initiateConnection() throws IOException {
-        String outUsername = getCmdData(".\\qbt\\qbt.exe settings set username admin").toString();
-        String outUrl = getCmdData(".\\qbt\\qbt.exe settings set url http://192.168.2.99:8080").toString();
-        if(outUsername.equals("") && outUrl.equals("")) {
-            return "Connection Initialized successfully.";
-        } else {
-            return "Message Log from setting username: " + outUsername + "\n" + "Message Log from Setting URL: " + outUrl;
+    public static void initiateConnection() {
+        try {
+            URLConnection connection = new URL("http://192.168.2.99:8080").openConnection(); //TODO
+            connection.connect();
+        } catch (IOException e) {
+            Gui.alert(AlertType.FATAL, "Cannot connect to IP adress: \n" + e.getLocalizedMessage());
+            System.exit(1);
         }
     }
 
