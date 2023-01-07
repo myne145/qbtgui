@@ -13,7 +13,7 @@ public class StartTheDownloadThread extends Thread {
     @Override
     public void run() {
         super.run();
-        if(QBitAPI.files.isEmpty()) {
+        if(QBitAPI.files.isEmpty() && QBitAPI.magnetLinks.isEmpty()) {
             JOptionPane.showMessageDialog(null, "There are no files to add!", "Error",
                     JOptionPane.ERROR_MESSAGE);
         } else {

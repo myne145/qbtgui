@@ -146,6 +146,8 @@ public class TorrentListThread extends Thread {
             progressConverter();
         } catch (Exception e) {
             Gui.alert(AlertType.ERROR, e.getLocalizedMessage());
+            guiButton.setEnabled(true);
+            spinner.setEnabled(true);
         }
 
     }
