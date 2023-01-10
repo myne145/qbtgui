@@ -1,15 +1,20 @@
 package Gui;
 
 import Tasks.ConfigFileManager;
+import Tasks.RefreshPlexLibrary;
 import Tasks.ShowDownloadingTorrents;
 import Tasks.StartDownloading;
 import com.formdev.flatlaf.ui.FlatRoundBorder;
+import xyz.derkades.plex4j.Server;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.awt.datatransfer.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -138,6 +143,7 @@ public class App extends JPanel {
             s.start();
             listModel.clear();
             listModel.add(0, "Adding torrents, please wait...");
+
         });
 
 
@@ -315,7 +321,13 @@ public class App extends JPanel {
         b = new JButton("Refresh plex media library");
         b.setRequestFocusEnabled(false);
         b.addActionListener(e-> {
-
+            RefreshPlexLibrary refreshPlexLibrary = null;
+            try {
+                refreshPlexLibrary = new RefreshPlexLibrary();
+            } catch (MalformedURLException ex) {
+                throw new RuntimeException(ex);
+            }
+            refreshPlexLibrary.start();
         });
         tb.add(b);
         b = new JButton("Show Currently Downloading Torrents");
