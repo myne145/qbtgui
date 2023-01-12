@@ -113,7 +113,7 @@ public class App extends JPanel {
                 ConfigFileManager config;
                 try {
                     config = new ConfigFileManager();
-                    config.saveValues();
+//                    config.saveValues();
                 } catch (IOException e) {
                     alert(AlertType.ERROR, Arrays.toString(e.getStackTrace()));
                 }
@@ -321,10 +321,12 @@ public class App extends JPanel {
         b = new JButton("Refresh plex media library");
         b.setRequestFocusEnabled(false);
         b.addActionListener(e-> {
-            RefreshPlexLibrary refreshPlexLibrary = null;
+            RefreshPlexLibrary refreshPlexLibrary;
             try {
                 refreshPlexLibrary = new RefreshPlexLibrary();
             } catch (MalformedURLException ex) {
+                throw new RuntimeException(ex);
+            } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
             refreshPlexLibrary.start();

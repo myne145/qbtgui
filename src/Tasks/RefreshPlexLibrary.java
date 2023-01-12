@@ -12,11 +12,12 @@ import java.util.ArrayList;
 
 public class RefreshPlexLibrary extends Thread{
     private boolean doAllLibrariesNeedToBeRefreshed = false;
-    private String serverIP = "http://192.168.2.200:32400";
-    private String serverToken = "tEdit_GycX2Y58K7WNmR";
+    private final ConfigFileManager config = new ConfigFileManager();
+    private String serverIP = config.getPlexIp();
+    private String serverToken = config.getPlexToken();
     private int libraryTorefresh;
     private final Server server = new Server(new URL(serverIP), serverToken);
-    public RefreshPlexLibrary() throws MalformedURLException {
+    public RefreshPlexLibrary() throws IOException {
         //config
     }
 

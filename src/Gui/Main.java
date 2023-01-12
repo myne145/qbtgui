@@ -20,7 +20,7 @@ public class Main {
         window.add(new App());
         window.getRootPane().setDefaultButton(App.startTheDownload);
         window.setVisible(true);
-        window.setLocation(cfg.launchPosX, cfg.launchPosY);
+        window.setLocation(cfg.getLaunchPosX(), cfg.getLaunchPosY());
         window.pack();
         window.setTitle("Qbittorrent WebUI Downloader");
         window.setPreferredSize(new Dimension(1000, 600));
@@ -41,9 +41,9 @@ public class Main {
             @Override
             public void windowClosing(WindowEvent e) {
                 try {
-                    cfg.saveValues(window.getX(), window.getY());
+                    cfg.updateCfg(window.getX(), window.getY());
                 } catch (IOException ex) {
-                    alert(AlertType.ERROR, "Cannot save values to config \n" + ex.getLocalizedMessage());
+                    throw new RuntimeException(ex);
                 }
             }
             @Override
