@@ -46,24 +46,4 @@ public abstract class Console {
         }
         return output.toString();
     }
-
-
-    private static OutputStream getCmdData(String cmd) throws IOException {
-        OutputStream output = new OutputStream() {
-            final StringBuilder string = new StringBuilder();
-
-            @Override
-            public void write(int b) {
-                this.string.append((char) b);
-            }
-
-            public String toString() {
-                return this.string.toString();
-            }
-        };
-        Process p = Runtime.getRuntime().exec(cmd);
-        p.getInputStream().transferTo(output);
-        p.getErrorStream().transferTo(output);
-        return output;
-    }
 }

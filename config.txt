@@ -1,4 +1,0 @@
-username=admin
-password=adminadmin
-serverIp=192.168.2.99:8080
-qbtPath=.\\qbt\\qbt.exe

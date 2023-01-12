@@ -1,3 +1,4 @@
+
 package Tasks;
 
 import org.json.*;
@@ -35,14 +36,12 @@ public class ConfigFileManager {
     private String qbittorrentIp;
     private String plexIp;
     private String plexToken;
-    private Object getKey(JSONArray array, String key)
-    {
+
+    private Object getKey(JSONArray array, String key) {
         Object value = null;
-        for (int i = 0; i < array.length(); i++)
-        {
+        for (int i = 0; i < array.length(); i++) {
             JSONObject item = array.getJSONObject(i);
-            if (item.keySet().contains(key))
-            {
+            if (item.keySet().contains(key)) {
                 value = item.get(key);
                 break;
             }

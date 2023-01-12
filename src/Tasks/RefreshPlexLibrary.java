@@ -6,19 +6,17 @@ import xyz.derkades.plex4j.Server;
 import xyz.derkades.plex4j.library.Library;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
 public class RefreshPlexLibrary extends Thread{
     private boolean doAllLibrariesNeedToBeRefreshed = false;
     private final ConfigFileManager config = new ConfigFileManager();
-    private String serverIP = config.getPlexIp();
-    private String serverToken = config.getPlexToken();
-    private int libraryTorefresh;
+    private final String serverIP = config.getPlexIp();
+    private final String serverToken = config.getPlexToken();
     private final Server server = new Server(new URL(serverIP), serverToken);
     public RefreshPlexLibrary() throws IOException {
-        //config
+
     }
 
     private ArrayList<Library> getWhichLibrariesToRefresh() throws IOException, SAXException {
@@ -37,8 +35,6 @@ public class RefreshPlexLibrary extends Thread{
         ArrayList<Library> libsToRefresh = getWhichLibrariesToRefresh();
         int passedChecks = 0;
         int failedChecks = 0;
-        for(Library lib : libsToRefresh)
-            System.out.println(lib.getTitle());
         if(!doAllLibrariesNeedToBeRefreshed) {
             if (libsToRefresh.size() == 1) {
                 if(server.refreshLibrary(libsToRefresh.get(0).getId()))

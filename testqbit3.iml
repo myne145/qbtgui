@@ -10,7 +10,5 @@
     <orderEntry type="library" name="FlatLaf-2.5" level="project" />
     <orderEntry type="library" name="gson-2.10" level="project" />
     <orderEntry type="library" name="json-20220924" level="project" />
-    <orderEntry type="library" name="jna-4.5.1" level="project" />
-    <orderEntry type="library" name="NativeFileChooser4J" level="project" />
   </component>
 </module>

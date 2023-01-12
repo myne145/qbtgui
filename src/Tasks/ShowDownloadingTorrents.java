@@ -18,7 +18,7 @@ public class ShowDownloadingTorrents extends Thread {
     public ArrayList<String> names = new ArrayList<>();
     private final ArrayList<BigDecimal> progresses = new ArrayList<>();
     private final ArrayList<Double> sizes = new ArrayList<>();
-    private final ArrayList<String> hashes = new ArrayList<>(); //future functionalities ;)
+    private final ArrayList<String> hashes = new ArrayList<>(); //future functionalities
     private final ArrayList<Double> speeds = new ArrayList<>();
     private String unitSymbol;
     private final JButton guiButton;

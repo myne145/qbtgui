@@ -9,7 +9,6 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 
-import static Gui.App.alert;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -25,15 +24,6 @@ public class Main {
         window.setTitle("Qbittorrent WebUI Downloader");
         window.setPreferredSize(new Dimension(1000, 600));
         window.setIconImage(iconImg.getImage());
-
-//        try {
-//            //QBitAPI.initiateConnection();
-//        } catch (Exception e) {
-//            alert(AlertType.FATAL, "Cannot connect to server \n" + e.getLocalizedMessage());
-//            System.exit(0);
-//        }
-
-
 
         window.addWindowListener(new WindowListener() {
             @Override

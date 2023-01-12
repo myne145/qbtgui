@@ -1,11 +1,9 @@
 package Gui;
 
-import Tasks.ConfigFileManager;
 import Tasks.RefreshPlexLibrary;
 import Tasks.ShowDownloadingTorrents;
 import Tasks.StartDownloading;
 import com.formdev.flatlaf.ui.FlatRoundBorder;
-import xyz.derkades.plex4j.Server;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,8 +11,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.awt.datatransfer.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,7 +47,7 @@ public class App extends JPanel {
     public static JButton startTheDownload = new JButton("Start Downloading");
 
     public static boolean isThreadRunning = false;
-    private JLabel processingPlsWait = new JLabel("");
+    private final JLabel processingPlsWait = new JLabel("");
     private void startThread(JButton j, JComboBox<String> jsp) {
         ShowDownloadingTorrents thread = new ShowDownloadingTorrents(torrentListModel, unitIndex, j, jsp);
 
@@ -110,13 +106,6 @@ public class App extends JPanel {
         unitIndex = 1;
         selectUnit.addItemListener(event -> {
             if(event.getStateChange() == ItemEvent.SELECTED) {
-                ConfigFileManager config;
-                try {
-                    config = new ConfigFileManager();
-//                    config.saveValues();
-                } catch (IOException e) {
-                    alert(AlertType.ERROR, Arrays.toString(e.getStackTrace()));
-                }
                 unitIndex = selectUnit.getSelectedIndex();
                 selectUnit.setEnabled(false);
                 b.setEnabled(false);
@@ -321,14 +310,13 @@ public class App extends JPanel {
         b = new JButton("Refresh plex media library");
         b.setRequestFocusEnabled(false);
         b.addActionListener(e-> {
-            RefreshPlexLibrary refreshPlexLibrary;
+            RefreshPlexLibrary refreshPlexLibrary = null;
             try {
                 refreshPlexLibrary = new RefreshPlexLibrary();
-            } catch (MalformedURLException ex) {
-                throw new RuntimeException(ex);
             } catch (IOException ex) {
-                throw new RuntimeException(ex);
+                alert(AlertType.ERROR, "Failed to connect to plex server:\n" + ex.getLocalizedMessage());
             }
+            assert refreshPlexLibrary != null;
             refreshPlexLibrary.start();
         });
         tb.add(b);
