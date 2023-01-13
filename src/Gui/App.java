@@ -48,7 +48,7 @@ public class App extends JPanel {
 
     public static boolean isThreadRunning = false;
     private final JLabel processingPlsWait = new JLabel("");
-    private void startThread(JButton j, JComboBox<String> jsp) {
+    public void startThread(JButton j, JComboBox<String> jsp) {
         ShowDownloadingTorrents thread = new ShowDownloadingTorrents(torrentListModel, unitIndex, j, jsp);
 
 
