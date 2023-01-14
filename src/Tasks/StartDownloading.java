@@ -1,6 +1,7 @@
 package Tasks;
 
 import Gui.AlertType;
+import Gui.App;
 
 import javax.swing.*;
 
@@ -62,6 +63,17 @@ public class StartDownloading extends Thread {
             magnetLinks.clear();
             listModel.clear();
             listModel.add(listModel.size(), "Drop Files Here");
+
+            if(errorCode == 0) {
+                try {
+                    sleep(2000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                App app = new App();
+                app.startThread(App.b, app.selectUnit);
+
+            }
         }
     }
 
