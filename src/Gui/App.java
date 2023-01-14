@@ -1,9 +1,11 @@
 package Gui;
 
+import Tasks.ConfigFileManager;
 import Tasks.RefreshPlexLibrary;
 import Tasks.ShowDownloadingTorrents;
 import Tasks.StartDownloading;
 import com.formdev.flatlaf.ui.FlatRoundBorder;
+import xyz.derkades.plex4j.Server;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -11,6 +13,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.awt.datatransfer.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -76,7 +79,7 @@ public class App extends JPanel {
     }
 
 
-    public App() {
+    public App() throws IOException {
         this.setLayout(null);
         scrollTest.setEnabled(true);
         scrollTest.setVisible(true);
@@ -136,6 +139,8 @@ public class App extends JPanel {
         });
 
 
+
+
         TransferHandler handler = new TransferHandler() {
             public boolean canImport(TransferSupport support) {
                 if (!support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
@@ -178,6 +183,8 @@ public class App extends JPanel {
             }
         };
         list.setTransferHandler(handler);
+
+
 
     }
 

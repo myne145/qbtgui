@@ -19,6 +19,7 @@ public class RefreshPlexLibrary extends Thread{
 
     }
 
+
     private ArrayList<Library> getWhichLibrariesToRefresh() throws IOException, SAXException {
         final ArrayList<Library> libraries = (ArrayList<Library>) server.getLibraries();
         ArrayList<Library> librariesToRefresh = new ArrayList<>();
