@@ -42,6 +42,7 @@ public class Main {
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
+                    System.exit(1);
                 }
                 @Override
                 public void windowClosed(WindowEvent e) {}

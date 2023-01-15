@@ -70,8 +70,8 @@ public class StartDownloading extends Thread {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                App app = new App();
-                app.startThread(App.b, app.selectUnit);
+//                App app = new App();
+//                app.startThread(App.b, app.selectUnit);
 
             }
         }

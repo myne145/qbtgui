@@ -8,9 +8,9 @@ import java.net.URL;
 
 import static Gui.App.alert;
 
-public class TestConnection extends Thread {
+public class TestPlexConnection extends Thread {
 
-    public TestConnection() {
+    public TestPlexConnection() {
 
     }
 
@@ -20,12 +20,7 @@ public class TestConnection extends Thread {
             alert(AlertType.ERROR, "Cannot connect to plex server. All plex features will not be avaliable.\n" + server.testConnection());
         }
     }
-    private void testQbittorrent() throws IOException { //TODO: implement (its exactly the same as above)
-        Server server = new Server(new URL(new ConfigFileManager().getPlexIp()),new ConfigFileManager().getPlexToken()); //haha lazy code go brrrrrrrrrrrr
-        if(server.testConnection() != null) {
-            alert(AlertType.ERROR, "Cannot connect to plex server. All plex features will not be avaliable.\n" + server.testConnection());
-        }
-    }
+
 
     @Override
     public void run() {
@@ -33,7 +28,7 @@ public class TestConnection extends Thread {
         try {
             testPlex();
         } catch (IOException e) {
-            e.printStackTrace();
+            alert(AlertType.ERROR, "Cannot connect to Plex server - the config value does not exist.\n" + e.getLocalizedMessage());
         }
     }
 }

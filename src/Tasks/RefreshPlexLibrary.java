@@ -64,7 +64,7 @@ public class RefreshPlexLibrary extends Thread{
         try {
             refreshPlex();
         } catch (IOException | SAXException e) {
-            throw new RuntimeException(e);
+            Gui.App.alert(AlertType.ERROR, "Plex server is unavaliable.");
         }
     }
 }

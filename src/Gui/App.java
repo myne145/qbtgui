@@ -1,9 +1,6 @@
 package Gui;
 
-import Tasks.ConfigFileManager;
-import Tasks.RefreshPlexLibrary;
-import Tasks.ShowDownloadingTorrents;
-import Tasks.StartDownloading;
+import Tasks.*;
 import com.formdev.flatlaf.ui.FlatRoundBorder;
 import xyz.derkades.plex4j.Server;
 
@@ -79,7 +76,9 @@ public class App extends JPanel {
     }
 
 
-    public App() throws IOException {
+    public App() {
+        new TestQbittorrentConnection().start();
+        new TestPlexConnection().start();
         this.setLayout(null);
         scrollTest.setEnabled(true);
         scrollTest.setVisible(true);
@@ -314,7 +313,7 @@ public class App extends JPanel {
                 jDialog.setVisible(true);
         });
         tb.add(b);
-        b = new JButton("Refresh plex media library");
+        b = new JButton("Refresh Plex Media Library");
         b.setRequestFocusEnabled(false);
         b.addActionListener(e-> {
             RefreshPlexLibrary refreshPlexLibrary = null;
