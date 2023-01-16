@@ -127,7 +127,7 @@ public class ShowDownloadingTorrents extends Thread {
             convertSpeedvalue();
             for(int i = 0; i < names.size(); i++) {
                 if(!names.get(i).isEmpty())
-                    model.addRow(new String[]{names.get(i),progressConverter().get(i), speeds.get(i) + speedUnitSymbol.get(i), sizes.get(i) + unitSymbol});
+                    model.addRow(new String[]{names.get(i),statuses.get(i), progressConverter().get(i), speeds.get(i) + speedUnitSymbol.get(i), sizes.get(i) + unitSymbol});
             }
             App.isThreadRunning = false;
             App.b.setEnabled(true);
@@ -139,6 +139,12 @@ public class ShowDownloadingTorrents extends Thread {
             guiButton.setEnabled(true);
             spinner.setEnabled(true);
         }
-
+/*
+uploading = seeding
+staledUP = completed, not seeding
+stalledDL = stalled download
+pausedDL = paused download
+pausedUP = paused seeding/uploading
+ */
     }
 }

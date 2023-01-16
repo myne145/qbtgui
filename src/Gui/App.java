@@ -85,16 +85,17 @@ public class App extends JPanel {
         listModel.add(0, "Drop Files Here");
         selectUnit.setEditable(false);
         torrentListModel.addColumn("name");
+        torrentListModel.addColumn("status");
         torrentListModel.addColumn("progress");
         torrentListModel.addColumn("speed");
         torrentListModel.addColumn("size");
 
-        torrentListTable.getColumn("progress").setPreferredWidth(30);
-        torrentListTable.getColumn("name").setPreferredWidth(250);
-        torrentListTable.getColumn("size").setPreferredWidth(75);
-        torrentListTable.getColumn("speed").setPreferredWidth(75);
+//        torrentListTable.getColumn("progress").setPreferredWidth(30);
+//        torrentListTable.getColumn("name").setPreferredWidth(250);
+//        torrentListTable.getColumn("size").setPreferredWidth(75);
+//        torrentListTable.getColumn("speed").setPreferredWidth(75);
 
-        torrentListModel.addRow(new String[]{"Filename","Progress","Speed","Size"});
+        torrentListModel.addRow(new String[]{"Filename","Status","Progress","Speed","Size"});
         torrentListTable.setBorder(new FlatRoundBorder());
         list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableModel.addColumn("Test");
