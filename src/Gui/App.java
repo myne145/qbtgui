@@ -200,7 +200,7 @@ public class App extends JPanel {
         selectUnit.setBounds(120,getHeight() - 40,60,20);
         selectUnitText.setBounds(10,getHeight() - 40,130,20);
         tb.setBounds(0,0,getWidth(),40);
-        startTheDownload.setBounds(getWidth() - 135, getHeight() - 40, 125, 30);
+        startTheDownload.setBounds(getWidth() - 150, getHeight() - 40, 140, 30);
         processingPlsWait.setBounds(30, 100, 125, 25);
     }
 

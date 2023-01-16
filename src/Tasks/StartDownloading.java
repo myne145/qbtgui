@@ -20,24 +20,25 @@ public class StartDownloading extends Thread {
     }
 
     public static int addTorrent() {
+        StringBuilder magnetList = new StringBuilder();
         if(!magnetLinks.isEmpty()) {
-            StringBuilder magnetList = new StringBuilder();
             for (String magnetLink : magnetLinks) {
                 magnetList.append(magnetLink).append(" ");
             }
         }
+        System.out.println(magnetList);
         StringBuilder torrentList = new StringBuilder();
         for (File file : files) {
             torrentList.append(file).append(" ");
         }
-        String outputMagnet = (execAndOutput(".\\qbt\\qbt.exe torrent add url " + magnetLinks));
+        String outputMagnet = (execAndOutput(".\\qbt\\qbt.exe torrent add url " + magnetList));
         String output = (execAndOutput(".\\qbt\\qbt.exe torrent add file " + torrentList + " --category Movies"));
 
-        if(!torrentList.isEmpty() || output.isEmpty()) {
+        if(!magnetList.isEmpty() || !torrentList.isEmpty() || output.isEmpty()) {
             torrentList.delete(0, torrentList.length());
             return 0;
         }
-        if(torrentList.isEmpty())
+        if(torrentList.isEmpty() && magnetList.isEmpty())
             return -1;
         return 1;
     }

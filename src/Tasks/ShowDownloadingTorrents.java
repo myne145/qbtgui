@@ -18,8 +18,10 @@ public class ShowDownloadingTorrents extends Thread {
     public ArrayList<String> names = new ArrayList<>();
     private final ArrayList<BigDecimal> progresses = new ArrayList<>();
     private final ArrayList<Double> sizes = new ArrayList<>();
+    private final ArrayList<Long> sizesLong = new ArrayList<>();
     private final ArrayList<String> hashes = new ArrayList<>(); //future functionalities
     private final ArrayList<Double> speeds = new ArrayList<>();
+    private final ArrayList<String> statuses = new ArrayList();
     private String unitSymbol;
     private final JButton guiButton;
     private final int unitIndex;
@@ -60,6 +62,7 @@ public class ShowDownloadingTorrents extends Thread {
             this.hashes.add(data.getString("hash"));
             this.progresses.add(data.getBigDecimal("progress"));
             this.speeds.add(data.getDouble("dlspeed"));
+            this.statuses.add(data.getString("state"));
         }
     }
     //SPEED IS IN BYTES!!!
@@ -67,7 +70,7 @@ public class ShowDownloadingTorrents extends Thread {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         switch(unitIndex) {
             case 0 -> {
-                sizes.replaceAll(aLong -> Double.valueOf(decimalFormat.format(aLong / 1024)));
+                sizes.replaceAll(aLong -> (double) Math.round(aLong / 1024));
                 unitSymbol = "kb";
             }
             case 1 -> {
