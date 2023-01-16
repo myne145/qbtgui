@@ -14,6 +14,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class App extends JPanel {
 
@@ -203,6 +206,12 @@ public class App extends JPanel {
         tb.setBounds(0,0,getWidth(),40);
         startTheDownload.setBounds(getWidth() - 150, getHeight() - 40, 140, 30);
         processingPlsWait.setBounds(30, 100, 125, 25);
+    }
+
+    private boolean verifyMagnetLink(String magnetLink) {
+        Pattern pattern = Pattern.compile("magnet:\\?xt=urn:[a-z0-9]+:[a-zA-Z0-9]{32}");
+        Matcher matcher = pattern.matcher(magnetLink);
+        return matcher.find();
     }
 
     public JToolBar createDummyToolBar() {
