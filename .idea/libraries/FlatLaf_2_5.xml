@@ -2,7 +2,6 @@
   <library name="FlatLaf-2.5">
     <CLASSES>
       <root url="jar://D:/Downloads/FlatLaf-2.5.zip!/" />
-      <root url="jar://$USER_HOME$/Downloads/flatlaf-2.6.jar!/" />
       <root url="jar://$PROJECT_DIR$/flatlaf-2.5.jar!/" />
     </CLASSES>
     <JAVADOC />
