@@ -2,7 +2,6 @@ package Gui;
 
 import Tasks.*;
 import com.formdev.flatlaf.ui.FlatRoundBorder;
-import xyz.derkades.plex4j.Server;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -10,7 +9,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.awt.datatransfer.*;
-import java.net.URL;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -42,15 +40,12 @@ public class App extends JPanel {
     };
     public JTable torrentListTable = new JTable(torrentListModel);
     private final JToolBar tb = new JToolBar();
-    private final JScrollPane scrollTest = new JScrollPane(torrentListTable);
 
     JButton finalB;
-    private final JScrollPane listScrollPane = new JScrollPane();
     public static JButton startTheDownload = new JButton("Start Downloading");
 
     public static boolean isThreadRunning = false;
     private final JLabel processingPlsWait = new JLabel("");
-    private final JFrame frame;
     public void startThread(JButton j, JComboBox<String> jsp) {
         ShowDownloadingTorrents thread = new ShowDownloadingTorrents(torrentListModel, unitIndex, j, jsp);
 
@@ -79,13 +74,10 @@ public class App extends JPanel {
     }
 
 
-    public App(JFrame frame) {
-        this.frame = frame;
+    public App() {
         new TestQbittorrentConnection().start();
         new TestPlexConnection().start();
         this.setLayout(null);
-        scrollTest.setEnabled(true);
-        scrollTest.setVisible(true);
         listModel.add(0, "Drop Files Here");
         selectUnit.setEditable(false);
         torrentListModel.addColumn("name");
@@ -95,10 +87,10 @@ public class App extends JPanel {
         torrentListModel.addColumn("size");
 
 
-        torrentListTable.getColumn("name").setPreferredWidth(240);
-        torrentListTable.getColumn("status").setPreferredWidth(60);
+        torrentListTable.getColumn("name").setPreferredWidth(230);
+        torrentListTable.getColumn("status").setPreferredWidth(80);
         torrentListTable.getColumn("progress").setPreferredWidth(40);
-        torrentListTable.getColumn("size").setPreferredWidth(50);
+        torrentListTable.getColumn("size").setPreferredWidth(60);
         torrentListTable.getColumn("speed").setPreferredWidth(50);
         torrentListTable.getTableHeader().setResizingAllowed(false);
         torrentListTable.setColumnSelectionAllowed(true);
@@ -125,20 +117,16 @@ public class App extends JPanel {
                 startThread(b, selectUnit);
             }
         });
-        listScrollPane.setViewportView(list);
         list.setLayoutOrientation(JList.VERTICAL);
-        add(listScrollPane);
         add(selectUnitText);
         add(selectUnit);
         add(torrentListTable);
         add(list);
-        add(scrollTest, BorderLayout.CENTER);
         add(createDummyToolBar(), BorderLayout.NORTH);
         add(createDummyMenuBar(), BorderLayout.NORTH);
         add(startTheDownload);
 
 
-        //torrentListTable.getTableHeader().setResizingAllowed(true);
         startTheDownload.addActionListener(e -> {
             StartDownloading s = new StartDownloading(listModel);
             s.start();

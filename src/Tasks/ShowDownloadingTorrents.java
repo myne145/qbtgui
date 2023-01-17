@@ -18,10 +18,9 @@ public class ShowDownloadingTorrents extends Thread {
     public ArrayList<String> names = new ArrayList<>();
     private final ArrayList<BigDecimal> progresses = new ArrayList<>();
     private final ArrayList<Double> sizes = new ArrayList<>();
-    private final ArrayList<Long> sizesLong = new ArrayList<>();
     private final ArrayList<String> hashes = new ArrayList<>(); //future functionalities
     private final ArrayList<Double> speeds = new ArrayList<>();
-    private final ArrayList<String> statuses = new ArrayList();
+    private final ArrayList<String> statuses = new ArrayList<>();
     private String unitSymbol;
     private final JButton guiButton;
     private final int unitIndex;
@@ -116,6 +115,19 @@ public class ShowDownloadingTorrents extends Thread {
         }
     }
 
+    private ArrayList<String> convertStatus() {
+        final ArrayList<String> arr = new ArrayList<>();
+        for(String s : statuses) {
+            switch (s) {
+                case "uploading" -> arr.add("Completed(UP)");
+                case "stalledUP" -> arr.add("Completed");
+                case "stalledDL" -> arr.add("DL stuck");
+                case "pausedDL", "pausedUP" -> arr.add("Paused");
+                default -> arr.add(s);
+            }
+        }
+        return arr;
+    }
 
     @Override
     public void run() {
@@ -127,7 +139,7 @@ public class ShowDownloadingTorrents extends Thread {
             convertSpeedvalue();
             for(int i = 0; i < names.size(); i++) {
                 if(!names.get(i).isEmpty())
-                    model.addRow(new String[]{names.get(i),statuses.get(i), progressConverter().get(i), speeds.get(i) + speedUnitSymbol.get(i), sizes.get(i) + unitSymbol});
+                    model.addRow(new String[]{names.get(i),convertStatus().get(i), progressConverter().get(i), speeds.get(i) + speedUnitSymbol.get(i), sizes.get(i) + unitSymbol});
             }
             App.isThreadRunning = false;
             App.b.setEnabled(true);

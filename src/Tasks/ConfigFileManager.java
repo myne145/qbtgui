@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 public class ConfigFileManager {
     JSONObject j = new JSONObject(Files.readString(Paths.get("config.json")));
     JSONArray networkVariables = j.getJSONArray("networkVariables");
-//    JSONArray appVariables = j.getJSONArray("appVariables");
 
     public int getLaunchPosX() {
         return launchPosX;
@@ -31,11 +30,11 @@ public class ConfigFileManager {
         return plexToken;
     }
 
-    private int launchPosX;
-    private int launchPosY;
-    private String qbittorrentIp;
-    private String plexIp;
-    private String plexToken;
+    private final int launchPosX;
+    private final int launchPosY;
+    private final String qbittorrentIp;
+    private final String plexIp;
+    private final String plexToken;
 
     private Object getKey(JSONArray array, String key) {
         Object value = null;
