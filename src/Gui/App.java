@@ -11,10 +11,8 @@ import java.awt.event.*;
 import java.io.*;
 import java.awt.datatransfer.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -244,6 +242,7 @@ public class App extends JPanel {
         b.setRequestFocusEnabled(false);
         b.addActionListener(e -> {
             StartDownloading.files.clear();
+            StartDownloading.magnetLinks.clear();
             listModel.removeAllElements();
             listModel.add(0, "Drop Files Here");
         });
@@ -283,10 +282,10 @@ public class App extends JPanel {
                     finalB.setEnabled(true);
                 });
                 ok.addActionListener(ee -> {
-                    if (!textArea.getText().equals("")) {
-                        String text = textArea.getText();
-                        String[] magnetSplitted = text.split("magnet:");
-                        StartDownloading.magnetLinks.addAll(Arrays.asList(magnetSplitted));
+                    String text = textArea.getText();
+                    System.out.println(text);
+                    if (verifyMagnetLink(text)) { //TODO: think of a good condition
+                        StartDownloading.magnetLinks.add(text);
                         StartDownloading.magnetLinks.replaceAll(s -> s.replace("\n", ""));
                         finalB.setEnabled(true);
                         jDialog.setVisible(false);

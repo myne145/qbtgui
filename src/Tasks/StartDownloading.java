@@ -19,13 +19,13 @@ public class StartDownloading extends Thread {
         this.listModel = l;
     }
 
+
     public static int addTorrent() {
         StringBuilder magnetList = new StringBuilder();
-        if(!magnetLinks.isEmpty()) {
-            for (String magnetLink : magnetLinks) {
-                magnetList.append(magnetLink).append(" ");
-            }
+        for (String magnetLink : magnetLinks) {
+            magnetList.append(magnetLink).append(" ");
         }
+
         System.out.println(magnetList);
         StringBuilder torrentList = new StringBuilder();
         for (File file : files) {
@@ -36,6 +36,7 @@ public class StartDownloading extends Thread {
 
         if(!magnetList.isEmpty() || !torrentList.isEmpty() || output.isEmpty()) {
             torrentList.delete(0, torrentList.length());
+            magnetList.delete(0, magnetList.length());
             return 0;
         }
         if(torrentList.isEmpty() && magnetList.isEmpty())
