@@ -23,7 +23,7 @@ public class Main {
             ImageIcon iconImg = new ImageIcon(".\\qbtapiicon.png");
             FlatDarkLaf.setup();
             JFrame window = new JFrame();
-            window.add(new App());
+            window.add(new App(window));
             window.getRootPane().setDefaultButton(App.startTheDownload);
             window.setVisible(true);
             window.setLocation(cfg.getLaunchPosX(), cfg.getLaunchPosY());

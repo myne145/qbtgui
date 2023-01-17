@@ -15,6 +15,7 @@ public class StartDownloading extends Thread {
     public static ArrayList<File> files = new ArrayList<>();
     public static ArrayList<String> magnetLinks = new ArrayList<>();
     private final DefaultListModel<Object> listModel;
+    public static boolean isWaiting = false;
     public StartDownloading(DefaultListModel<Object> l) {
         this.listModel = l;
     }
@@ -51,10 +52,15 @@ public class StartDownloading extends Thread {
             JOptionPane.showMessageDialog(null, "There are no files to add!", "Error",
                     JOptionPane.ERROR_MESSAGE);
         } else {
+            isWaiting = true;
+            listModel.clear();
+            listModel.add(0, "Adding torrents, please wait...");
             int errorCode = addTorrent();
-            if(errorCode == 0)
+            if(errorCode == 0) {
                 alert(AlertType.INFO, "Succesfully added " + files.size() + " torrents and " +
                         magnetLinks.size() + " magnet links.");
+                isWaiting = false;
+            }
             if(errorCode == -1)
                 JOptionPane.showMessageDialog(null, "Torrent list is empty (somehow), torrents were not added",
                         "Error", JOptionPane.ERROR_MESSAGE);

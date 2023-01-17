@@ -38,6 +38,7 @@ public class App extends JPanel {
             //all cells false
             return false;
         }
+
     };
     public JTable torrentListTable = new JTable(torrentListModel);
     private final JToolBar tb = new JToolBar();
@@ -49,6 +50,7 @@ public class App extends JPanel {
 
     public static boolean isThreadRunning = false;
     private final JLabel processingPlsWait = new JLabel("");
+    private final JFrame frame;
     public void startThread(JButton j, JComboBox<String> jsp) {
         ShowDownloadingTorrents thread = new ShowDownloadingTorrents(torrentListModel, unitIndex, j, jsp);
 
@@ -77,7 +79,8 @@ public class App extends JPanel {
     }
 
 
-    public App() {
+    public App(JFrame frame) {
+        this.frame = frame;
         new TestQbittorrentConnection().start();
         new TestPlexConnection().start();
         this.setLayout(null);
@@ -91,10 +94,15 @@ public class App extends JPanel {
         torrentListModel.addColumn("speed");
         torrentListModel.addColumn("size");
 
-//        torrentListTable.getColumn("progress").setPreferredWidth(30);
-//        torrentListTable.getColumn("name").setPreferredWidth(250);
-//        torrentListTable.getColumn("size").setPreferredWidth(75);
-//        torrentListTable.getColumn("speed").setPreferredWidth(75);
+
+        torrentListTable.getColumn("name").setPreferredWidth(240);
+        torrentListTable.getColumn("status").setPreferredWidth(60);
+        torrentListTable.getColumn("progress").setPreferredWidth(40);
+        torrentListTable.getColumn("size").setPreferredWidth(50);
+        torrentListTable.getColumn("speed").setPreferredWidth(50);
+        torrentListTable.getTableHeader().setResizingAllowed(false);
+        torrentListTable.setColumnSelectionAllowed(true);
+        torrentListTable.setRowSelectionAllowed(true);
 
         torrentListModel.addRow(new String[]{"Filename","Status","Progress","Speed","Size"});
         torrentListTable.setBorder(new FlatRoundBorder());
@@ -134,8 +142,6 @@ public class App extends JPanel {
         startTheDownload.addActionListener(e -> {
             StartDownloading s = new StartDownloading(listModel);
             s.start();
-            listModel.clear();
-            listModel.add(0, "Adding torrents, please wait...");
 
         });
 
@@ -158,28 +164,29 @@ public class App extends JPanel {
             }
 
             public boolean importData(TransferSupport support) {
-                if (!canImport(support)) {
-                    return false;
-                }
-                Transferable t = support.getTransferable();
-                ArrayList<File> fileList = new ArrayList<>();
-                if(listModel.get(0).equals("Drop Files Here"))
-                    listModel.remove(0);
-                try {
-                    List<File> l = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
-                    for (File f : l) {
-                        if(getFileExtension(f).equals(".torrent")) {
-                            fileList.add(f);
-                            listModel.add(listModel.size(), f.getName());
-                        } else {
-                            listModel.add(listModel.size(), "File is not a torrent!");
-                        }
+                if (!StartDownloading.isWaiting) {
+                    if (!canImport(support)) {
+                        return false;
                     }
-                    StartDownloading.files.addAll(fileList);
-                } catch (UnsupportedFlavorException | IOException e) {
-                    return false;
+                    Transferable t = support.getTransferable();
+                    ArrayList<File> fileList = new ArrayList<>();
+                    if (listModel.get(0).equals("Drop Files Here"))
+                        listModel.remove(0);
+                    try {
+                        List<File> l = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
+                        for (File f : l) {
+                            if (getFileExtension(f).equals(".torrent")) {
+                                fileList.add(f);
+                                listModel.add(listModel.size(), f.getName());
+                            } else {
+                                listModel.add(listModel.size(), "File is not a torrent!");
+                            }
+                        }
+                        StartDownloading.files.addAll(fileList);
+                    } catch (UnsupportedFlavorException | IOException e) {
+                        return false;
+                    }
                 }
-
                 return true;
             }
         };
@@ -218,23 +225,25 @@ public class App extends JPanel {
         b.setPreferredSize(new Dimension(100,30));
 
         b.addActionListener(e -> {
-            fileDialog.setMultipleMode(true);
-            fileDialog.setFile("*.torrent");
-            fileDialog.setVisible(true);
-            File[] files = fileDialog.getFiles();
-            ArrayList<File> arr = new ArrayList<>();
-            if(files.length > 0) {
-                for (File file : files) {
-                    if (getFileExtension(file).equals(".torrent")) {
-                        listModel.add(listModel.size(), file.getName());
-                        arr.add(file);
-                    } else {
-                        listModel.add(listModel.size(), "File is not a Torrent!");
+            if(!StartDownloading.isWaiting) {
+                fileDialog.setMultipleMode(true);
+                fileDialog.setFile("*.torrent");
+                fileDialog.setVisible(true);
+                File[] files = fileDialog.getFiles();
+                ArrayList<File> arr = new ArrayList<>();
+                if (files.length > 0) {
+                    for (File file : files) {
+                        if (getFileExtension(file).equals(".torrent")) {
+                            listModel.add(listModel.size(), file.getName());
+                            arr.add(file);
+                        } else {
+                            listModel.add(listModel.size(), "File is not a Torrent!");
+                        }
                     }
+                    if (listModel.get(0).equals("Drop Files Here"))
+                        listModel.remove(0);
+                    StartDownloading.files.addAll(arr);
                 }
-                if (listModel.get(0).equals("Drop Files Here"))
-                    listModel.remove(0);
-                StartDownloading.files.addAll(arr);
             }
         });
         tb.add(b);
