@@ -119,6 +119,7 @@ public class ShowDownloadingTorrents extends Thread {
         final ArrayList<String> arr = new ArrayList<>();
         for(String s : statuses) {
             switch (s) {
+                case "downloading" -> arr.add("Downloading");
                 case "uploading" -> arr.add("Completed(UP)");
                 case "stalledUP" -> arr.add("Completed");
                 case "stalledDL" -> arr.add("DL stuck");
