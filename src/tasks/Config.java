@@ -7,25 +7,25 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Config {
-    JSONObject configFile = new JSONObject(Files.readString(Paths.get("config.json")));
 
-    public String getQbittorrentIp() {
+    public static String getQbittorrentIp() {
         return qbittorrentIp;
     }
 
-    public String getPlexIp() {
+    public static String getPlexIp() {
         return plexIp;
     }
 
-    public String getPlexToken() {
+    public static String getPlexToken() {
         return plexToken;
     }
 
-    private final String qbittorrentIp;
-    private final String plexIp;
-    private final String plexToken;
+    private static String qbittorrentIp;
+    private static String plexIp;
+    private static String plexToken;
 
-    public Config() throws IOException {
+    public static void initialize() throws IOException {
+        JSONObject configFile = new JSONObject(Files.readString(Paths.get("config.json")));
         qbittorrentIp = configFile.getString("qbittorrentIP");
         plexIp = configFile.getString("plexServerIP");
         plexToken = configFile.getString("plexToken");

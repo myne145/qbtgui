@@ -6,17 +6,18 @@ import xyz.derkades.plex4j.Server;
 import xyz.derkades.plex4j.library.Library;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 public class RefreshPlexLibrary extends Thread{
     private boolean doAllLibrariesNeedToBeRefreshed = false;
-    private final Config config = new Config();
-    private final String serverIP = config.getPlexIp();
-    private final String serverToken = config.getPlexToken();
-    private final Server server = new Server(new URL(serverIP), serverToken);
-    public RefreshPlexLibrary() throws IOException {
+    private final String serverIP = Config.getPlexIp();
+    private final String serverToken = Config.getPlexToken();
+    private final Server server = new Server(new URI(serverIP).toURL(), serverToken);
 
+    public RefreshPlexLibrary() throws MalformedURLException, URISyntaxException {
     }
 
 

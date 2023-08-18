@@ -9,18 +9,19 @@ import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.prefs.Preferences;
 
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, URISyntaxException {
         //possible args: -refresh_plex, -nogui
         //load gui only if there's no nogui argument
         Preferences preferences = Preferences.userNodeForPackage(Main.class);
         if(!Arrays.asList(args).contains("-nogui")) {
-            Config cfg = new Config();
-
+//            Config cfg = new Config();
+            Config.initialize();
 
             ImageIcon iconImg = new ImageIcon(".\\qbtapiicon.png");
             FlatDarkLaf.setup();

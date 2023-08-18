@@ -12,8 +12,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static tasks.Console.refreshTorrentList;
-
 public class ShowDownloadingTorrents extends Thread {
     public ArrayList<String> names = new ArrayList<>();
     private final ArrayList<BigDecimal> progresses = new ArrayList<>();
@@ -35,6 +33,24 @@ public class ShowDownloadingTorrents extends Thread {
         this.spinner = jsp;
     }
 
+    public static OutputStream refreshTorrentList() throws IOException {
+        OutputStream output = new OutputStream() {
+            final StringBuilder string = new StringBuilder();
+
+            @Override
+            public void write(int b) {
+                this.string.append((char) b);
+            }
+
+            public String toString() {
+                return this.string.toString();
+            }
+        };
+        Process p = Runtime.getRuntime().exec(".\\qbt\\qbt torrent list --format json");
+        p.getInputStream().transferTo(output);
+        p.getErrorStream().transferTo(output);
+        return output;
+    }
 
     private ArrayList<String> splitJsons() throws IOException {
         String[] split = refreshTorrentList().toString().split("},");

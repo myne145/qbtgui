@@ -9,18 +9,15 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.awt.datatransfer.*;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class App extends JPanel {
-
-
-
     private final DefaultListModel<Object> listModel = new DefaultListModel<>();
     private final JList<Object> addedFilesList = new JList<>(listModel);
-    private JCheckBoxMenuItem copyItem;
     private final FileDialog fileDialog = new FileDialog((Dialog) null, "Select Torrent Files");
     private final static Dimension scrRes = Toolkit.getDefaultToolkit().getScreenSize();
     private final static int scrX = scrRes.width;
@@ -303,7 +300,7 @@ public class App extends JPanel {
             RefreshPlexLibrary refreshPlexLibrary = null;
             try {
                 refreshPlexLibrary = new RefreshPlexLibrary();
-            } catch (IOException ex) {
+            } catch (IOException | URISyntaxException ex) {
                 alert(AlertType.ERROR, "Failed to connect to plex server:\n" + ex.getLocalizedMessage());
             }
             assert refreshPlexLibrary != null;
