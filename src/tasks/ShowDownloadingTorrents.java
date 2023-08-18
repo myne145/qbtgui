@@ -1,7 +1,7 @@
-package Tasks;
+package tasks;
 
-import Gui.App;
-import Gui.AlertType;
+import gui.App;
+import gui.AlertType;
 import org.json.JSONObject;
 
 import javax.swing.*;
@@ -12,7 +12,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static Tasks.Console.refreshTorrentList;
+import static tasks.Console.refreshTorrentList;
 
 public class ShowDownloadingTorrents extends Thread {
     public ArrayList<String> names = new ArrayList<>();

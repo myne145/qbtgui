@@ -1,12 +1,12 @@
-package Tasks;
+package tasks;
 
-import Gui.AlertType;
+import gui.AlertType;
 import xyz.derkades.plex4j.Server;
 
 import java.io.IOException;
 import java.net.URL;
 
-import static Gui.App.alert;
+import static gui.App.alert;
 
 public class TestQbittorrentConnection extends Thread{
 
@@ -15,7 +15,7 @@ public class TestQbittorrentConnection extends Thread{
     }
 
     private void testQbittorrent() throws IOException {
-        Server server = new Server(new URL(new ConfigFileManager().getQbittorrentIp()),new ConfigFileManager().getPlexToken()); //haha lazy code go brrrrrrrrrrrr
+        Server server = new Server(new URL(new Config().getQbittorrentIp()),new Config().getPlexToken()); //haha lazy code go brrrrrrrrrrrr
         if(server.testConnection() != null) {
             alert(AlertType.FATAL, "Cannot connect to Qbittorrent WebUI server. The program will now exit.\n" + server.testConnection());
             System.exit(1);

@@ -1,6 +1,6 @@
-package Gui;
+package gui;
 
-import Tasks.*;
+import tasks.*;
 import com.formdev.flatlaf.ui.FlatRoundBorder;
 
 import javax.swing.*;
@@ -19,7 +19,7 @@ public class App extends JPanel {
 
 
     private final DefaultListModel<Object> listModel = new DefaultListModel<>();
-    private final JList<Object> list = new JList<>(listModel);
+    private final JList<Object> addedFilesList = new JList<>(listModel);
     private JCheckBoxMenuItem copyItem;
     private final FileDialog fileDialog = new FileDialog((Dialog) null, "Select Torrent Files");
     private final static Dimension scrRes = Toolkit.getDefaultToolkit().getScreenSize();
@@ -33,11 +33,11 @@ public class App extends JPanel {
     public DefaultTableModel torrentListModel = new DefaultTableModel() {
         @Override
         public boolean isCellEditable(int row, int column) {
-            //all cells false
             return false;
         }
 
     };
+
     public JTable torrentListTable = new JTable(torrentListModel);
     private final JToolBar tb = new JToolBar();
 
@@ -45,7 +45,8 @@ public class App extends JPanel {
     public static JButton startTheDownload = new JButton("Start Downloading");
 
     public static boolean isThreadRunning = false;
-    private final JLabel processingPlsWait = new JLabel("");
+    private final String DROP_FILES_TEXT = "Drop Files Here                                                       ";
+
     public void startThread(JButton j, JComboBox<String> jsp) {
         ShowDownloadingTorrents thread = new ShowDownloadingTorrents(torrentListModel, unitIndex, j, jsp);
 
@@ -77,8 +78,8 @@ public class App extends JPanel {
     public App() {
         new TestQbittorrentConnection().start();
         new TestPlexConnection().start();
-        this.setLayout(null);
-        listModel.add(0, "Drop Files Here");
+        this.setLayout(new BorderLayout());
+        listModel.add(0, "Drop Files Here                                                       ");
         selectUnit.setEditable(false);
         torrentListModel.addColumn("name");
         torrentListModel.addColumn("status");
@@ -87,22 +88,17 @@ public class App extends JPanel {
         torrentListModel.addColumn("size");
 
 
-        torrentListTable.getColumn("name").setPreferredWidth(230);
-        torrentListTable.getColumn("status").setPreferredWidth(80);
-        torrentListTable.getColumn("progress").setPreferredWidth(40);
-        torrentListTable.getColumn("size").setPreferredWidth(60);
-        torrentListTable.getColumn("speed").setPreferredWidth(50);
         torrentListTable.getTableHeader().setResizingAllowed(false);
         torrentListTable.setColumnSelectionAllowed(true);
         torrentListTable.setRowSelectionAllowed(true);
 
         torrentListModel.addRow(new String[]{"Filename","Status","Progress","Speed","Size"});
         torrentListTable.setBorder(new FlatRoundBorder());
-        list.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        addedFilesList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableModel.addColumn("Test");
-        list.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        list.setBorder(new FlatRoundBorder());
-        list.setDragEnabled(true);
+        addedFilesList.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        addedFilesList.setBorder(new FlatRoundBorder());
+        addedFilesList.setDragEnabled(true);
         selectUnit.addItem("KB");
         selectUnit.addItem("MB");
         selectUnit.addItem("GB");
@@ -113,42 +109,35 @@ public class App extends JPanel {
                 unitIndex = selectUnit.getSelectedIndex();
                 selectUnit.setEnabled(false);
                 b.setEnabled(false);
-                isThreadRunning = true; //the worst solution ever, if I add even one more jbutton to the toolbar, it's gonna break af
+                isThreadRunning = true;
                 startThread(b, selectUnit);
             }
         });
-        list.setLayoutOrientation(JList.VERTICAL);
-        add(selectUnitText);
-        add(selectUnit);
-        add(torrentListTable);
-        add(list);
-        add(createDummyToolBar(), BorderLayout.NORTH);
-        add(createDummyMenuBar(), BorderLayout.NORTH);
-        add(startTheDownload);
+        addedFilesList.setLayoutOrientation(JList.VERTICAL);
+
+//        addedFilesList.setPreferredSize(new Dimension(300, 100));
+
+        JPanel bottomPanel = new JPanel();
+
+        bottomPanel.add(selectUnitText, BorderLayout.LINE_START);
+        bottomPanel.add(selectUnit, BorderLayout.CENTER);
+        bottomPanel.add(startTheDownload, BorderLayout.LINE_END);
+
+        add(createDummyToolBar(), BorderLayout.PAGE_START);
+        add(addedFilesList, BorderLayout.LINE_START);
+        add(torrentListTable, BorderLayout.CENTER);
+
+        add(bottomPanel, BorderLayout.PAGE_END);
 
 
-        startTheDownload.addActionListener(e -> {
-            StartDownloading s = new StartDownloading(listModel);
-            s.start();
-
-        });
+        startTheDownload.addActionListener(e -> new StartDownloading(listModel).start());
 
 
 
 
         TransferHandler handler = new TransferHandler() {
             public boolean canImport(TransferSupport support) {
-                if (!support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                    return false;
-                }
-                if (copyItem.isSelected()) {
-                    boolean copySupported = (COPY & support.getSourceDropActions()) == COPY;
-                    if (!copySupported) {
-                        return false;
-                    }
-                    support.setDropAction(COPY);
-                }
-                return true;
+                return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
             }
 
             public boolean importData(TransferSupport support) {
@@ -158,7 +147,7 @@ public class App extends JPanel {
                     }
                     Transferable t = support.getTransferable();
                     ArrayList<File> fileList = new ArrayList<>();
-                    if (listModel.get(0).equals("Drop Files Here"))
+                    if (listModel.get(0).equals(DROP_FILES_TEXT))
                         listModel.remove(0);
                     try {
                         List<File> l = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
@@ -178,7 +167,7 @@ public class App extends JPanel {
                 return true;
             }
         };
-        list.setTransferHandler(handler);
+        addedFilesList.setTransferHandler(handler);
 
 
 
@@ -189,20 +178,9 @@ public class App extends JPanel {
         return new Dimension(1000,610);
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        torrentListTable.setBounds(getWidth() / 2 - 40, 40, getWidth() / 2 + 35,getHeight() - 90);
-        list.setBounds(5,40,getWidth() / 2 - 55, getHeight() - 90);
-        selectUnit.setBounds(120,getHeight() - 40,60,20);
-        selectUnitText.setBounds(10,getHeight() - 40,130,20);
-        tb.setBounds(0,0,getWidth(),40);
-        startTheDownload.setBounds(getWidth() - 150, getHeight() - 40, 140, 30);
-        processingPlsWait.setBounds(30, 100, 125, 25);
-    }
 
     private boolean verifyMagnetLink(String magnetLink) {
-        Pattern pattern = Pattern.compile("magnet:\\?xt=urn:[a-z0-9]+:[a-zA-Z0-9]{32}");
+        Pattern pattern = Pattern.compile("magnet:\\?xt=urn:[a-z\\d]+:[a-zA-Z\\d]{32}");
         Matcher matcher = pattern.matcher(magnetLink);
         return matcher.find();
     }
@@ -228,7 +206,7 @@ public class App extends JPanel {
                             listModel.add(listModel.size(), "File is not a Torrent!");
                         }
                     }
-                    if (listModel.get(0).equals("Drop Files Here"))
+                    if (listModel.get(0).equals(DROP_FILES_TEXT))
                         listModel.remove(0);
                     StartDownloading.files.addAll(arr);
                 }
@@ -241,7 +219,7 @@ public class App extends JPanel {
             StartDownloading.files.clear();
             StartDownloading.magnetLinks.clear();
             listModel.removeAllElements();
-            listModel.add(0, "Drop Files Here");
+            listModel.add(0, DROP_FILES_TEXT);
         });
         tb.add(b);
 
@@ -286,7 +264,7 @@ public class App extends JPanel {
                         StartDownloading.magnetLinks.replaceAll(s -> s.replace("\n", ""));
                         finalB.setEnabled(true);
                         jDialog.setVisible(false);
-                        if (listModel.get(0).equals("Drop Files Here"))
+                        if (listModel.get(0).equals(DROP_FILES_TEXT))
                             listModel.remove(0);
                         listModel.add(listModel.size(), "Magnet Link");
                     } else {
@@ -344,12 +322,5 @@ public class App extends JPanel {
         tb.add(b);
         tb.setFloatable(false);
         return tb;
-    }
-
-    public JMenuBar createDummyMenuBar() {
-        JMenuBar mb = new JMenuBar();
-        copyItem = new JCheckBoxMenuItem("Use COPY Action");
-        copyItem.setMnemonic(KeyEvent.VK_C);
-        return mb;
     }
 }

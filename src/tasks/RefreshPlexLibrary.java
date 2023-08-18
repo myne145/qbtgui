@@ -1,6 +1,6 @@
-package Tasks;
+package tasks;
 
-import Gui.AlertType;
+import gui.AlertType;
 import org.xml.sax.SAXException;
 import xyz.derkades.plex4j.Server;
 import xyz.derkades.plex4j.library.Library;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class RefreshPlexLibrary extends Thread{
     private boolean doAllLibrariesNeedToBeRefreshed = false;
-    private final ConfigFileManager config = new ConfigFileManager();
+    private final Config config = new Config();
     private final String serverIP = config.getPlexIp();
     private final String serverToken = config.getPlexToken();
     private final Server server = new Server(new URL(serverIP), serverToken);
@@ -39,7 +39,7 @@ public class RefreshPlexLibrary extends Thread{
         if(!doAllLibrariesNeedToBeRefreshed) {
             if (libsToRefresh.size() == 1) {
                 if(server.refreshLibrary(libsToRefresh.get(0).getId()))
-                    Gui.App.alert(AlertType.INFO, "Succesfully refreshed " + passedChecks +
+                    gui.App.alert(AlertType.INFO, "Succesfully refreshed " + passedChecks +
                             " libraries, failed to refresh " + failedChecks + " libraries.");
             } else {
                 for (Library lib : libsToRefresh) {
@@ -49,12 +49,12 @@ public class RefreshPlexLibrary extends Thread{
                         failedChecks++;
                     }
                 }
-                Gui.App.alert(AlertType.INFO, "Succesfully refreshed " + passedChecks +
+                gui.App.alert(AlertType.INFO, "Succesfully refreshed " + passedChecks +
                         " libraries, failed to refresh " + failedChecks + " libraries.");
             }
         } else {
             if(server.refreshAllLibraries())
-                Gui.App.alert(AlertType.INFO, "Succesfuly refreshed " + libsToRefresh.size() + " plex libraries.");
+                gui.App.alert(AlertType.INFO, "Succesfuly refreshed " + libsToRefresh.size() + " plex libraries.");
         }
     }
 
@@ -64,7 +64,7 @@ public class RefreshPlexLibrary extends Thread{
         try {
             refreshPlex();
         } catch (IOException | SAXException e) {
-            Gui.App.alert(AlertType.ERROR, "Plex server is unavaliable.");
+            gui.App.alert(AlertType.ERROR, "Plex server is unavaliable.");
         }
     }
 }

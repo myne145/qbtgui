@@ -1,12 +1,12 @@
-package Tasks;
+package tasks;
 
-import Gui.AlertType;
+import gui.AlertType;
 import xyz.derkades.plex4j.Server;
 
 import java.io.IOException;
 import java.net.URL;
 
-import static Gui.App.alert;
+import static gui.App.alert;
 
 public class TestPlexConnection extends Thread {
 
@@ -15,7 +15,7 @@ public class TestPlexConnection extends Thread {
     }
 
     private void testPlex() throws IOException {
-        Server server = new Server(new URL(new ConfigFileManager().getPlexIp()),new ConfigFileManager().getPlexToken()); //haha lazy code go brrrrrrrrrrrr
+        Server server = new Server(new URL(new Config().getPlexIp()),new Config().getPlexToken()); //haha lazy code go brrrrrrrrrrrr
         if(server.testConnection() != null) {
             alert(AlertType.ERROR, "Cannot connect to plex server. All plex features will not be avaliable.\n" + server.testConnection());
         }

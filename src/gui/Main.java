@@ -1,30 +1,34 @@
-package Gui;
+package gui;
 
-import Tasks.RefreshPlexLibrary;
+import tasks.RefreshPlexLibrary;
 import com.formdev.flatlaf.FlatDarkLaf;
 
-import Tasks.ConfigFileManager;
+import tasks.Config;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.prefs.Preferences;
 
 
 public class Main {
     public static void main(String[] args) throws IOException {
         //possible args: -refresh_plex, -nogui
         //load gui only if there's no nogui argument
+        Preferences preferences = Preferences.userNodeForPackage(Main.class);
         if(!Arrays.asList(args).contains("-nogui")) {
-            ConfigFileManager cfg = new ConfigFileManager();
+            Config cfg = new Config();
+
+
             ImageIcon iconImg = new ImageIcon(".\\qbtapiicon.png");
             FlatDarkLaf.setup();
             JFrame window = new JFrame();
             window.add(new App());
             window.getRootPane().setDefaultButton(App.startTheDownload);
             window.setVisible(true);
-            window.setLocation(cfg.getLaunchPosX(), cfg.getLaunchPosY());
+            window.setLocation(preferences.getInt("WINDOW_LOCATION_X", 0), preferences.getInt("WINDOW_LOCATION_Y", 0));
             window.pack();
             window.setTitle("Qbittorrent WebUI Downloader");
             window.setPreferredSize(new Dimension(1000, 600));
@@ -35,11 +39,8 @@ public class Main {
                 public void windowOpened(WindowEvent e) {}
                 @Override
                 public void windowClosing(WindowEvent e) {
-                    try {
-                        cfg.updateCfg(window.getX(), window.getY());
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    }
+                    preferences.putInt("WINDOW_LOCATION_X", window.getX());
+                    preferences.putInt("WINDOW_LOCATION_Y", window.getY());
                     System.exit(1);
                 }
                 @Override

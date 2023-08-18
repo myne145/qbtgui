@@ -1,14 +1,14 @@
-package Tasks;
+package tasks;
 
-import Gui.AlertType;
+import gui.AlertType;
 
 import javax.swing.*;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import static Gui.App.alert;
-import static Tasks.Console.execAndOutput;
+import static gui.App.alert;
+import static tasks.Console.execAndOutput;
 
 public class StartDownloading extends Thread {
     public static ArrayList<File> files = new ArrayList<>();
