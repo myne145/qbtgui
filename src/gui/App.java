@@ -73,8 +73,6 @@ public class App extends JPanel {
 
 
     public App() {
-        new TestQbittorrentConnection().start();
-        new TestPlexConnection().start();
         this.setLayout(new BorderLayout());
         listModel.add(0, "Drop Files Here                                                       ");
         selectUnit.setEditable(false);

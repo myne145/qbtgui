@@ -16,7 +16,7 @@ public class ShowDownloadingTorrents extends Thread {
     public ArrayList<String> names = new ArrayList<>();
     private final ArrayList<BigDecimal> progresses = new ArrayList<>();
     private final ArrayList<Double> sizes = new ArrayList<>();
-    private final ArrayList<String> hashes = new ArrayList<>(); //future functionalities
+    private final ArrayList<String> hashes = new ArrayList<>();
     private final ArrayList<Double> speeds = new ArrayList<>();
     private final ArrayList<String> statuses = new ArrayList<>();
     private String unitSymbol;
@@ -73,14 +73,14 @@ public class ShowDownloadingTorrents extends Thread {
                 App.alert(AlertType.ERROR, e.getLocalizedMessage() + "\n whatever that means");
             }
             this.names.add(data.getString("name"));
-            this.sizes.add((double) data.getLong("size")); //ALWAYS returns bytes
+            this.sizes.add((double) data.getLong("size")); //always returns bytes
             this.hashes.add(data.getString("hash"));
             this.progresses.add(data.getBigDecimal("progress"));
             this.speeds.add(data.getDouble("dlspeed"));
             this.statuses.add(data.getString("state"));
         }
     }
-    //SPEED IS IN BYTES!!!
+
     private void unitConversion() {
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         switch(unitIndex) {
