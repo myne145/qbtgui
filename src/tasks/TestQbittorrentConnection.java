@@ -1,7 +1,6 @@
 package tasks;
 
 import gui.AlertType;
-import xyz.derkades.plex4j.Server;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,11 +15,11 @@ public class TestQbittorrentConnection extends Thread{
     }
 
     private void testQbittorrent() throws IOException, URISyntaxException {
-        Server server = new Server(new URI(Config.getQbittorrentIp()).toURL(),Config.getPlexToken());
-        if(server.testConnection() != null) {
-            alert(AlertType.FATAL, "Cannot connect to Qbittorrent WebUI server. The program will now exit.\n" + server.testConnection());
-            System.exit(1);
-        }
+//        Server server = new Server(new URI(Config.getQbittorrentIp()).toURL(),Config.getPlexToken());
+//        if(server.testConnection() != null) {
+//            alert(AlertType.FATAL, "Cannot connect to Qbittorrent WebUI server. The program will now exit.\n" + server.testConnection());
+//            System.exit(1);
+//        }
     }
 
     @Override

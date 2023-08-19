@@ -1,7 +1,6 @@
 package tasks;
 
 import gui.AlertType;
-import xyz.derkades.plex4j.Server;
 
 import java.io.IOException;
 import java.net.URI;
@@ -17,10 +16,10 @@ TestPlexConnection extends Thread {
     }
 
     private void testPlex() throws IOException, URISyntaxException {
-        Server server = new Server(new URI(Config.getPlexIp()).toURL(),Config.getPlexToken());
-        if(server.testConnection() != null) {
-            alert(AlertType.ERROR, "Cannot connect to plex server. All plex features will not be avaliable.\n" + server.testConnection());
-        }
+//        Server server = new Server(new URI(Config.getPlexIp()).toURL(),Config.getPlexToken());
+//        if(server.testConnection() != null) {
+//            alert(AlertType.ERROR, "Cannot connect to plex server. All plex features will not be avaliable.\n" + server.testConnection());
+//        }
     }
 
 
