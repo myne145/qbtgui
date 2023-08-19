@@ -6,9 +6,7 @@ import xyz.derkades.plex4j.Server;
 import xyz.derkades.plex4j.library.Library;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.*;
 import java.util.ArrayList;
 
 public class RefreshPlexLibrary extends Thread{
@@ -59,13 +57,28 @@ public class RefreshPlexLibrary extends Thread{
         }
     }
 
+    private void refreshAllPlexLibraries() throws URISyntaxException, IOException {
+        URL url = new URI(Config.getPlexIp() + "/library/sections/all/refresh?X-Plex-Token=" + Config.getPlexToken()).toURL();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+        int code = connection.getResponseCode();
+        if(code == 200) {
+            gui.App.alert(AlertType.INFO, "Succesfuly refreshed all Plex libraries.");
+        } else if(code == 401) {
+            gui.App.alert(AlertType.ERROR, "Provided Plex API token is invalid.");
+        }
+
+    }
     @Override
     public void run() {
-        super.run();
-        try {
-            refreshPlex();
-        } catch (IOException | SAXException e) {
-            gui.App.alert(AlertType.ERROR, "Plex server is unavaliable.");
-        }
+
+
+
+//        try {
+//            refreshPlex();
+//        } catch (IOException | SAXException e) {
+//            gui.App.alert(AlertType.ERROR, "Plex server is unavaliable.");
+//        }
     }
 }

@@ -229,7 +229,7 @@ public class App extends JPanel {
         b.addActionListener(e-> {
                 JDialog jDialog = new JDialog((Dialog) null);
                 finalB.setEnabled(false);
-                jDialog.setIconImage(new ImageIcon(".\\qbtapiicon.png").getImage());
+                jDialog.setIconImage(new ImageIcon(".\\icon_temp.png").getImage());
                 JLabel label = new JLabel("Enter magnet link below (max one link!)");
                 label.putClientProperty("FlatLaf.styleClass", "h3");
                 JTextArea textArea = new JTextArea();

@@ -18,12 +18,14 @@ public class Main {
     public static void main(String[] args) throws IOException, URISyntaxException {
         //possible args: -refresh_plex, -nogui
         //load gui only if there's no nogui argument
+        
+
         Preferences preferences = Preferences.userNodeForPackage(Main.class);
         if(!Arrays.asList(args).contains("-nogui")) {
 //            Config cfg = new Config();
             Config.initialize();
 
-            ImageIcon iconImg = new ImageIcon(".\\qbtapiicon.png");
+            ImageIcon iconImg = new ImageIcon(".\\icon_temp.png");
             FlatDarkLaf.setup();
             JFrame window = new JFrame();
             window.add(new App());
