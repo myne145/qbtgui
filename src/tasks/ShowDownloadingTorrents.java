@@ -46,7 +46,7 @@ public class ShowDownloadingTorrents extends Thread {
                 return this.string.toString();
             }
         };
-        Process p = Runtime.getRuntime().exec(".\\qbt\\qbt torrent list --format json");
+        Process p = Runtime.getRuntime().exec(".\\qbt_api\\qbt torrent list --format json");
         p.getInputStream().transferTo(output);
         p.getErrorStream().transferTo(output);
         return output;

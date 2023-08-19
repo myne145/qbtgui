@@ -31,8 +31,8 @@ public class StartDownloading extends Thread {
         for (File file : files) {
             torrentList.append(file).append(" ");
         }
-        String outputMagnet = (execAndOutput(".\\qbt\\qbt.exe torrent add url " + magnetList));
-        String output = (execAndOutput(".\\qbt\\qbt.exe torrent add file " + torrentList + " --category Movies"));
+        String outputMagnet = (execAndOutput(".\\qbt_api\\qbt.exe torrent add url " + magnetList));
+        String output = (execAndOutput(".\\qbt_api\\qbt.exe torrent add file " + torrentList + " --category Movies"));
 
         if(!magnetList.isEmpty() || !torrentList.isEmpty() || output.isEmpty()) {
             torrentList.delete(0, torrentList.length());
