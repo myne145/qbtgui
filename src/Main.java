@@ -1,11 +1,14 @@
 import gui.App;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.ProtocolException;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import tasks.RefreshPlexLibrary;
 import com.formdev.flatlaf.FlatDarkLaf;
@@ -31,7 +34,45 @@ public class Main {
         httpPost.setEntity(new UrlEncodedFormEntity(values));
         CloseableHttpResponse httpresponse = client.execute(httpPost);
 
-        String cookie = httpresponse.getHeader("set-cookie").toString().split("SID=")[1].split("; ")[0];
+        Config.cookie = httpresponse.getHeader("set-cookie").toString().split("SID=")[1].split("; ")[0];
+        System.out.println(Config.cookie);
+    }
+
+    private static void logoutOfQbittorrent() throws IOException, URISyntaxException {
+        URL url = new URI(Config.getQbittorrentIp() + "/api/v2/auth/logout").toURL();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        System.out.println(connection.getResponseCode());
+    }
+
+    private static void addTorrentsToQbittorrent() throws IOException {
+        String cookie = "SID=your_sid";
+
+        // Create HTTP client
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        // Create the multipart entity
+        HttpEntity entity = MultipartEntityBuilder.create()
+                .addBinaryBody("torrents", new File("INSERT_TORRENT_HERE"), ContentType.APPLICATION_OCTET_STREAM, "8f18036b7a205c9347cb84a253975e12f7adddf2.torrent")
+//                .addBinaryBody("torrents", new File("UFS.torrent"), ContentType.APPLICATION_OCTET_STREAM, "UFS.torrent")
+                .setBoundary("-------------------------acebdf13572468")
+                .build();
+
+        // Create the POST request
+        HttpPost httpPost = new HttpPost(Config.getQbittorrentIp() + "/api/v2/torrents/add");
+        httpPost.setHeader("User-Agent", "Fiddler");
+        httpPost.setHeader("Cookie", "SID=" + Config.cookie);
+        httpPost.setEntity(entity);
+
+        // Execute the request and get the response
+        CloseableHttpResponse response = httpClient.execute(httpPost);
+        int statusCode = response.getCode();
+        System.out.println("Response Code: " + statusCode);
+
+        // Cleanup
+        response.close();
+        httpClient.close();
+        
     }
 
     public static void main(String[] args) throws IOException, URISyntaxException, ProtocolException {
@@ -39,6 +80,7 @@ public class Main {
         //load gui only if there's no nogui argument
         Config.initialize();
         loginToQbittorrent();
+        addTorrentsToQbittorrent();
 
 
         Preferences preferences = Preferences.userNodeForPackage(Main.class);
@@ -62,6 +104,11 @@ public class Main {
                 public void windowClosing(WindowEvent e) {
                     preferences.putInt("WINDOW_LOCATION_X", window.getX());
                     preferences.putInt("WINDOW_LOCATION_Y", window.getY());
+                    try {
+                        logoutOfQbittorrent();
+                    } catch (IOException | URISyntaxException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     System.exit(1);
                 }
                 @Override

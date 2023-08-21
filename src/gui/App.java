@@ -112,6 +112,7 @@ public class App extends JPanel {
 
 //        addedFilesList.setPreferredSize(new Dimension(300, 100));
 
+
         JPanel bottomPanel = new JPanel();
 
         bottomPanel.add(selectUnitText, BorderLayout.LINE_START);

@@ -23,6 +23,7 @@ public class Config {
     private static String qbittorrentIp;
     private static String plexIp;
     private static String plexToken;
+    public static String cookie;
 
     public static void initialize() throws IOException {
         JSONObject configFile = new JSONObject(Files.readString(Paths.get("config.json")));
