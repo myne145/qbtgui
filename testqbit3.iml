@@ -11,5 +11,6 @@
     <orderEntry type="library" name="json" level="project" />
     <orderEntry type="library" name="commons.io" level="project" />
     <orderEntry type="library" name="apache.httpcomponents.client5.httpclient5" level="project" />
+    <orderEntry type="library" name="slf4j.simple" level="project" />
   </component>
 </module>

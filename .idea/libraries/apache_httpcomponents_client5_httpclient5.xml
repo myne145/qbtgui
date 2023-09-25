@@ -5,7 +5,6 @@
       <root url="jar://$PROJECT_DIR$/lib/httpclient5-5.2-beta1.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/httpcore5-5.2-beta2.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/httpcore5-h2-5.2-beta2.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/slf4j-api-1.7.25.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

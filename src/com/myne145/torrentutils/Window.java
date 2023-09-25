@@ -1,5 +1,7 @@
-import gui.App;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
+package com.myne145.torrentutils;
+
+import com.myne145.torrentutils.gui.App;
+import com.myne145.torrentutils.tasks.RefreshPlexLibrary;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
@@ -8,12 +10,10 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.ProtocolException;
-import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
-import tasks.RefreshPlexLibrary;
 import com.formdev.flatlaf.FlatDarkLaf;
 
-import tasks.Config;
+import com.myne145.torrentutils.tasks.Config;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.prefs.Preferences;
 
-public class Main {
+public class Window extends JFrame{
 
     private static void loginToQbittorrent() throws URISyntaxException, IOException, ProtocolException {
         CloseableHttpClient client = HttpClients.createDefault();
@@ -45,7 +45,7 @@ public class Main {
         System.out.println(connection.getResponseCode());
     }
 
-    private static void addTorrentsToQbittorrent() throws IOException {
+    private static void addTorrentsToQbittorrent(File[] torrents) throws IOException {
         String cookie = "SID=your_sid";
 
         // Create HTTP client
@@ -75,53 +75,56 @@ public class Main {
         
     }
 
+    private Window() {
+        Preferences preferences = Preferences.userNodeForPackage(Window.class);
+        ImageIcon iconImg = new ImageIcon(".\\icon_temp.png");
+        this.add(new App());
+        this.getRootPane().setDefaultButton(App.startTheDownload);
+        this.setVisible(true);
+        this.setLocation(preferences.getInt("WINDOW_LOCATION_X", 0), preferences.getInt("WINDOW_LOCATION_Y", 0));
+        this.pack();
+        this.setTitle("Qbittorrent WebUI Downloader");
+        this.setPreferredSize(new Dimension(1000, 600));
+        this.setIconImage(iconImg.getImage());
+
+        this.addWindowListener(new WindowListener() {
+            @Override
+            public void windowOpened(WindowEvent e) {}
+            @Override
+            public void windowClosing(WindowEvent e) {
+                preferences.putInt("WINDOW_LOCATION_X", getX());
+                preferences.putInt("WINDOW_LOCATION_Y", getY());
+                try {
+                    logoutOfQbittorrent();
+                } catch (IOException | URISyntaxException ex) {
+                    throw new RuntimeException(ex);
+                }
+                System.exit(1);
+            }
+            @Override
+            public void windowClosed(WindowEvent e) {}
+            @Override
+            public void windowIconified(WindowEvent e) {}
+            @Override
+            public void windowDeiconified(WindowEvent e) {}
+            @Override
+            public void windowActivated(WindowEvent e) {}
+            @Override
+            public void windowDeactivated(WindowEvent e) {}
+        });
+    }
+
     public static void main(String[] args) throws IOException, URISyntaxException, ProtocolException {
         //possible args: -refresh_plex, -nogui
-        //load gui only if there's no nogui argument
+        //load com.myne145.gui only if there's no nogui argument
         Config.initialize();
         loginToQbittorrent();
-        addTorrentsToQbittorrent();
 
 
-        Preferences preferences = Preferences.userNodeForPackage(Main.class);
+
         if(!Arrays.asList(args).contains("-nogui")) {
-            ImageIcon iconImg = new ImageIcon(".\\icon_temp.png");
             FlatDarkLaf.setup();
-            JFrame window = new JFrame();
-            window.add(new App());
-            window.getRootPane().setDefaultButton(App.startTheDownload);
-            window.setVisible(true);
-            window.setLocation(preferences.getInt("WINDOW_LOCATION_X", 0), preferences.getInt("WINDOW_LOCATION_Y", 0));
-            window.pack();
-            window.setTitle("Qbittorrent WebUI Downloader");
-            window.setPreferredSize(new Dimension(1000, 600));
-            window.setIconImage(iconImg.getImage());
-
-            window.addWindowListener(new WindowListener() {
-                @Override
-                public void windowOpened(WindowEvent e) {}
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    preferences.putInt("WINDOW_LOCATION_X", window.getX());
-                    preferences.putInt("WINDOW_LOCATION_Y", window.getY());
-                    try {
-                        logoutOfQbittorrent();
-                    } catch (IOException | URISyntaxException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    System.exit(1);
-                }
-                @Override
-                public void windowClosed(WindowEvent e) {}
-                @Override
-                public void windowIconified(WindowEvent e) {}
-                @Override
-                public void windowDeiconified(WindowEvent e) {}
-                @Override
-                public void windowActivated(WindowEvent e) {}
-                @Override
-                public void windowDeactivated(WindowEvent e) {}
-            });
+            new Window();
         }
         if(Arrays.asList(args).contains("-refresh_plex")) {
             new RefreshPlexLibrary().start();

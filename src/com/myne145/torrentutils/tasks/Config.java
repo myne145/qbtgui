@@ -1,5 +1,5 @@
 
-package tasks;
+package com.myne145.torrentutils.tasks;
 
 import org.json.*;
 import java.io.*;
