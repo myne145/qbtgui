@@ -11,19 +11,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.awt.datatransfer.*;
-import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class App extends JPanel {
     private final DefaultListModel<Object> listModel = new DefaultListModel<>();
     private final JList<Object> addedFilesList = new JList<>(listModel);
     private final FileDialog fileDialog = new FileDialog((Dialog) null, "Select Torrent Files");
-    private final static Dimension scrRes = Toolkit.getDefaultToolkit().getScreenSize();
-    private final static int scrX = scrRes.width;
-    private final static int scrY = scrRes.height;
+    public final static Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private final DefaultTableModel tableModel = new DefaultTableModel();
     public final JComboBox<String> selectUnit = new JComboBox<>();
     public final JLabel selectUnitText = new JLabel("Select display unit:");
@@ -39,8 +34,6 @@ public class App extends JPanel {
 
     public JTable torrentListTable = new JTable(torrentListModel);
     private final JToolBar toolbar = new JToolBar();
-
-    JButton finalB;
     public static JButton startTheDownload = new JButton("Start Downloading");
 
     public static boolean isThreadRunning = false;
@@ -48,8 +41,6 @@ public class App extends JPanel {
 
     public void startThread(JButton j, JComboBox<String> jsp) {
         ShowDownloadingTorrents thread = new ShowDownloadingTorrents(torrentListModel, unitIndex, j, jsp);
-
-
         if(torrentListTable.getRowCount() > 1) {
             torrentListModel.setRowCount(1);
         }
@@ -88,10 +79,15 @@ public class App extends JPanel {
         torrentListTable.getTableHeader().setResizingAllowed(false);
         torrentListTable.setColumnSelectionAllowed(true);
         torrentListTable.setRowSelectionAllowed(true);
+        torrentListTable.setFocusable(false);
+        torrentListTable.setBackground(new Color(60, 63, 65));
 
         torrentListModel.addRow(new String[]{"Filename","Status","Progress","Speed","Size"});
-        torrentListTable.setBorder(new FlatRoundBorder());
+//        torrentListTable.setBorder(new FlatRoundBorder());
         addedFilesList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        addedFilesList.setFocusable(false);
+
+
         tableModel.addColumn("Test");
         addedFilesList.setFont(new Font("Segoe UI", Font.BOLD, 12));
         addedFilesList.setBorder(new FlatRoundBorder());
@@ -170,13 +166,6 @@ public class App extends JPanel {
         return new Dimension(1000,610);
     }
 
-
-    private boolean verifyMagnetLink(String magnetLink) {
-        Pattern pattern = Pattern.compile("magnet:\\?xt=urn:[a-z\\d]+:[a-zA-Z\\d]{32}");
-        Matcher matcher = pattern.matcher(magnetLink);
-        return matcher.find();
-    }
-
     public JToolBar createDummyToolBar() {
         toolbarButton = new JButton("Open Files");
         toolbarButton.setRequestFocusEnabled(false);
@@ -219,87 +208,17 @@ public class App extends JPanel {
         toolbar.add(toolbarButton);
         toolbarButton = new JButton("Add Magnet Link");
         toolbarButton.setRequestFocusEnabled(false);
-//        JButton finalB = b;
-        finalB = toolbarButton;
         toolbarButton.addActionListener(e-> {
-                JDialog jDialog = new JDialog((Dialog) null);
-                finalB.setEnabled(false);
-                jDialog.setIconImage(new ImageIcon(".\\icon_temp.png").getImage());
-                JLabel label = new JLabel("Enter magnet link below (max one link!)");
-                label.putClientProperty("FlatLaf.styleClass", "h3");
-                JTextArea textArea = new JTextArea();
-                JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-                JButton ok = new JButton("Ok");
-                JButton cancel = new JButton("Cancel");
-                jDialog.setPreferredSize(new Dimension(400, 500));
-                jDialog.setLocation(scrX / 2 - 200, scrY / 2 - 250);
-                jDialog.pack();
-                jDialog.setLayout(null);
-                jDialog.setTitle("Enter Magnet Link");
-                jDialog.setResizable(false);
-                label.setBounds(25, 10, 280, 30);
-                textArea.setBounds(15, 50, 355, 330);
-                separator.setBounds(0, 400, 400, 10);
-                textArea.setLineWrap(true);
-                textArea.setBorder(new FlatRoundBorder());
-                ok.setBounds(215, 425, 80, 24);
-                cancel.setBounds(300, 425, 80, 24);
-                cancel.addActionListener(eee -> {
-                    jDialog.setVisible(false);
-                    finalB.setEnabled(true);
-                });
-                ok.addActionListener(ee -> {
-                    String text = textArea.getText();
-                    System.out.println(text);
-                    if (verifyMagnetLink(text)) {
-                        StartDownloading.getMagnetQueueList().add(text);
-                        StartDownloading.getMagnetQueueList().replaceAll(s -> s.replace("\n", ""));
-                        finalB.setEnabled(true);
-                        jDialog.setVisible(false);
-                        if (listModel.get(0).equals(DROP_FILES_TEXT))
-                            listModel.remove(0);
-                        listModel.add(listModel.size(), "Magnet Link");
-                    } else {
-                        alert(AlertType.ERROR, "Magnet link is invalid");
-                    }
-                });
-                jDialog.addWindowListener(new WindowListener() {
-                    @Override
-                    public void windowOpened(WindowEvent e) {}
-                    @Override
-                    public void windowClosing(WindowEvent e) {
-                       finalB.setEnabled(true);
-                    }
-                    @Override
-                    public void windowClosed(WindowEvent e) {}
-                    @Override
-                    public void windowIconified(WindowEvent e) {}
-                    @Override
-                    public void windowDeiconified(WindowEvent e) {}
-                    @Override
-                    public void windowActivated(WindowEvent e) {}
-                    @Override
-                    public void windowDeactivated(WindowEvent e) {}
-                });
-                jDialog.add(cancel);
-                jDialog.add(separator);
-                jDialog.add(ok);
-                jDialog.add(textArea);
-                jDialog.add(label);
-                jDialog.setVisible(true);
+            JButton magnetButton = (JButton) e.getSource();
+            magnetButton.setEnabled(false);
+            AddMagnetDialog addMagnetDialog = new AddMagnetDialog(this, e);
+            magnetButton.setEnabled(true);
         });
         toolbar.add(toolbarButton);
         toolbarButton = new JButton("Refresh Plex Media Library");
         toolbarButton.setRequestFocusEnabled(false);
         toolbarButton.addActionListener(e-> {
-            RefreshPlexLibrary refreshPlexLibrary = null;
-            try {
-                refreshPlexLibrary = new RefreshPlexLibrary();
-            } catch (IOException | URISyntaxException ex) {
-                alert(AlertType.ERROR, "Failed to connect to plex server:\n" + ex.getLocalizedMessage());
-            }
-            assert refreshPlexLibrary != null;
-            refreshPlexLibrary.start();
+            new RefreshPlexLibrary().start();
         });
         toolbar.add(toolbarButton);
         toolbarButton = new JButton("Show Currently Downloading Torrents");
@@ -313,6 +232,15 @@ public class App extends JPanel {
             });
         toolbar.add(toolbarButton);
         toolbar.setFloatable(false);
+        toolbar.setBackground(new Color(51, 51, 52));
         return toolbar;
+    }
+
+    public DefaultListModel<Object> getListModel() {
+        return listModel;
+    }
+
+    public String getDefaultDropMessage() {
+        return DROP_FILES_TEXT;
     }
 }

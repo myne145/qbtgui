@@ -1,5 +1,6 @@
 package com.myne145.torrentutils;
 
+import com.formdev.flatlaf.IntelliJTheme;
 import com.myne145.torrentutils.gui.App;
 import com.myne145.torrentutils.tasks.RefreshPlexLibrary;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -87,6 +88,12 @@ public class Window extends JFrame{
         this.setPreferredSize(new Dimension(1000, 600));
         this.setIconImage(iconImg.getImage());
 
+        JFrame.setDefaultLookAndFeelDecorated(true);
+        this.getRootPane().putClientProperty("JRootPane.titleBarBackground", new Color(51, 51, 52));
+        this.getRootPane().putClientProperty("JRootPane.titleBarForeground", new Color(204, 204, 204));
+//        this.getRootPane().putClientProperty("MenuItem.background", new Color(253, 0, 0));
+//        this.getRootPane().putClientProperty("MenuItem.opaque", true);
+
         this.addWindowListener(new WindowListener() {
             @Override
             public void windowOpened(WindowEvent e) {}
@@ -123,7 +130,8 @@ public class Window extends JFrame{
 
 
         if(!Arrays.asList(args).contains("-nogui")) {
-            FlatDarkLaf.setup();
+            InputStream inputStream = new FileInputStream("src/com/myne145/torrentutils/resources/DarkFlatTheme/DarkFlatTheme.json");
+            IntelliJTheme.setup(inputStream);
             new Window();
         }
         if(Arrays.asList(args).contains("-refresh_plex")) {
