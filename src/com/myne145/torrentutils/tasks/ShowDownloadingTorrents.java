@@ -70,7 +70,7 @@ public class ShowDownloadingTorrents extends Thread {
             try {
                 data = new JSONObject(splitDatum);
             } catch (Exception e) {
-                App.alert(AlertType.ERROR, e.getLocalizedMessage() + "\n whatever that means");
+                App.alert(AlertType.ERROR, e.getLocalizedMessage());
             }
             this.names.add(data.getString("name"));
             this.sizes.add((double) data.getLong("size")); //always returns bytes

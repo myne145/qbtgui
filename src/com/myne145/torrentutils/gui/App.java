@@ -1,5 +1,7 @@
 package com.myne145.torrentutils.gui;
 
+import com.formdev.flatlaf.extras.FlatSVGIcon;
+import com.formdev.flatlaf.ui.FlatLineBorder;
 import com.formdev.flatlaf.ui.FlatRoundBorder;
 import com.myne145.torrentutils.tasks.RefreshPlexLibrary;
 import com.myne145.torrentutils.tasks.ShowDownloadingTorrents;
@@ -80,10 +82,11 @@ public class App extends JPanel {
         torrentListTable.setColumnSelectionAllowed(true);
         torrentListTable.setRowSelectionAllowed(true);
         torrentListTable.setFocusable(false);
-        torrentListTable.setBackground(new Color(60, 63, 65));
+//        torrentListTable.setBackground(new Color(60, 63, 65));
 
         torrentListModel.addRow(new String[]{"Filename","Status","Progress","Speed","Size"});
-//        torrentListTable.setBorder(new FlatRoundBorder());
+        torrentListTable.setBorder(new FlatRoundBorder());
+//        torrentListTable.setBorder(new FlatLineBorder(new Insets(10,10,10,10),Color.BLACK));
         addedFilesList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         addedFilesList.setFocusable(false);
 
@@ -112,7 +115,7 @@ public class App extends JPanel {
 
 
         JPanel bottomPanel = new JPanel();
-
+        bottomPanel.setBackground(new Color(51, 51, 52));
         bottomPanel.add(selectUnitText, BorderLayout.LINE_START);
         bottomPanel.add(selectUnit, BorderLayout.CENTER);
         bottomPanel.add(startTheDownload, BorderLayout.LINE_END);
@@ -120,6 +123,7 @@ public class App extends JPanel {
         add(createDummyToolBar(), BorderLayout.PAGE_START);
         add(addedFilesList, BorderLayout.LINE_START);
         add(torrentListTable, BorderLayout.CENTER);
+//        add(Box.createRigidArea(new Dimension(1,10)), BorderLayout.LINE_END);
 
         add(bottomPanel, BorderLayout.PAGE_END);
 
@@ -168,6 +172,7 @@ public class App extends JPanel {
 
     public JToolBar createDummyToolBar() {
         toolbarButton = new JButton("Open Files");
+        toolbarButton.setIcon(new FlatSVGIcon(new File("src/com/myne145/torrentutils/resources/addFile.svg")));
         toolbarButton.setRequestFocusEnabled(false);
         toolbarButton.setPreferredSize(new Dimension(100,30));
 
@@ -195,6 +200,7 @@ public class App extends JPanel {
         });
         toolbar.add(toolbarButton);
         toolbarButton = new JButton("Clear All Files");
+        toolbarButton.setIcon(new FlatSVGIcon(new File("src/com/myne145/torrentutils/resources/delete.svg")));
         toolbarButton.setRequestFocusEnabled(false);
         toolbarButton.addActionListener(e -> {
             StartDownloading.getTorrentQueueList().clear();
@@ -207,11 +213,12 @@ public class App extends JPanel {
 
         toolbar.add(toolbarButton);
         toolbarButton = new JButton("Add Magnet Link");
+        toolbarButton.setIcon(new FlatSVGIcon(new File("src/com/myne145/torrentutils/resources/addLink.svg")));
         toolbarButton.setRequestFocusEnabled(false);
         toolbarButton.addActionListener(e-> {
             JButton magnetButton = (JButton) e.getSource();
             magnetButton.setEnabled(false);
-            AddMagnetDialog addMagnetDialog = new AddMagnetDialog(this, e);
+            new AddMagnetDialog(this, e);
             magnetButton.setEnabled(true);
         });
         toolbar.add(toolbarButton);
