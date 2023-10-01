@@ -48,52 +48,6 @@ public class Window extends JFrame{
     }
 
 
-    private static boolean addTorrentsToQbittorrent(List<File> torrents, List<String> magnetLinks) throws IOException {
-        // Create HTTP client
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-
-        // Create the multipart entity
-        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
-        entityBuilder.setBoundary("-------------------------acebdf13572468");
-
-        //Magnet links
-        StringBuilder magnets = new StringBuilder();
-        if(magnetLinks != null) {
-            for (String s : magnetLinks)
-                magnets.append(s).append("\n");
-            entityBuilder.addTextBody("urls", magnets.toString());
-        }
-        System.out.println(magnets);
-
-
-        // Add torrent files
-        if (torrents != null) {
-            for (File torrent : torrents) {
-                entityBuilder.addBinaryBody("torrents", torrent, ContentType.APPLICATION_OCTET_STREAM, torrent.getName());
-            }
-        }
-
-
-        HttpEntity entity = entityBuilder.build();
-
-        // Create the POST request
-        HttpPost httpPost = new HttpPost(Config.getQbittorrentIp() + "/api/v2/torrents/add");
-        httpPost.setHeader("User-Agent", "Fiddler");
-        httpPost.setHeader("Cookie", "SID=" + Config.cookie);
-        httpPost.setEntity(entity);
-
-        // Execute the request and get the response
-        CloseableHttpResponse response = httpClient.execute(httpPost);
-
-        // Cleanup
-        response.close();
-        httpClient.close();
-
-        // Check the response code
-        return response.getCode() == 200;
-    }
-
-
     private Window() {
         Preferences preferences = Preferences.userNodeForPackage(Window.class);
         ImageIcon iconImg = new ImageIcon(".\\icon_temp.png");
