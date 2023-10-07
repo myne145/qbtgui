@@ -1,11 +1,12 @@
 package com.myne145.torrentutils.gui;
 
 import com.formdev.flatlaf.extras.FlatSVGIcon;
-import com.formdev.flatlaf.ui.FlatLineBorder;
 import com.formdev.flatlaf.ui.FlatRoundBorder;
 import com.myne145.torrentutils.tasks.RefreshPlexLibrary;
 import com.myne145.torrentutils.tasks.ShowDownloadingTorrents;
 import com.myne145.torrentutils.tasks.StartDownloading;
+import com.sun.javafx.application.PlatformImpl;
+import javafx.stage.FileChooser;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -19,13 +20,13 @@ import java.util.List;
 public class App extends JPanel {
     private final DefaultListModel<Object> listModel = new DefaultListModel<>();
     private final JList<Object> addedFilesList = new JList<>(listModel);
-    private final FileDialog fileDialog = new FileDialog((Dialog) null, "Select Torrent Files");
     public final static Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private final DefaultTableModel tableModel = new DefaultTableModel();
     public final JComboBox<String> selectUnit = new JComboBox<>();
     public final JLabel selectUnitText = new JLabel("Select display unit:");
     public static int unitIndex;
     public static JButton toolbarButton;
+    private final FileChooser fileDialog = new FileChooser();
     public DefaultTableModel torrentListModel = new DefaultTableModel() {
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -111,8 +112,6 @@ public class App extends JPanel {
         });
         addedFilesList.setLayoutOrientation(JList.VERTICAL);
 
-//        addedFilesList.setPreferredSize(new Dimension(300, 100));
-
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setBackground(new Color(51, 51, 52));
@@ -120,10 +119,13 @@ public class App extends JPanel {
         bottomPanel.add(selectUnit, BorderLayout.CENTER);
         bottomPanel.add(startTheDownload, BorderLayout.LINE_END);
 
-        add(createDummyToolBar(), BorderLayout.PAGE_START);
-        add(addedFilesList, BorderLayout.LINE_START);
-        add(torrentListTable, BorderLayout.CENTER);
-//        add(Box.createRigidArea(new Dimension(1,10)), BorderLayout.LINE_END);
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setOneTouchExpandable(true);
+        splitPane.add(addedFilesList);
+        splitPane.add(torrentListTable);
+        add(getToolbar(), BorderLayout.PAGE_START);
+        add(splitPane, BorderLayout.CENTER);
 
         add(bottomPanel, BorderLayout.PAGE_END);
 
@@ -170,20 +172,21 @@ public class App extends JPanel {
         return new Dimension(1000,610);
     }
 
-    public JToolBar createDummyToolBar() {
+    public JToolBar getToolbar() {
         toolbarButton = new JButton("Open Files");
         toolbarButton.setIcon(new FlatSVGIcon(new File("src/com/myne145/torrentutils/resources/addFile.svg")));
         toolbarButton.setRequestFocusEnabled(false);
         toolbarButton.setPreferredSize(new Dimension(100,30));
 
         toolbarButton.addActionListener(e -> {
-            if(!StartDownloading.isWaiting) {
-                fileDialog.setMultipleMode(true);
-                fileDialog.setFile("*.torrent");
-                fileDialog.setVisible(true);
-                File[] files = fileDialog.getFiles();
+            if(StartDownloading.isWaiting) {
+                return;
+            }
+            PlatformImpl.startup(() -> {
+                fileDialog.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Torrent Files", "*.torrent"));
+                List<File> files = fileDialog.showOpenMultipleDialog(null);
                 ArrayList<File> arr = new ArrayList<>();
-                if (files.length > 0) {
+                if (files != null && !files.isEmpty()) {
                     for (File file : files) {
                         if (isTorrent(file)) {
                             listModel.add(listModel.size(), file.getName());
@@ -195,8 +198,10 @@ public class App extends JPanel {
                     if (listModel.get(0).equals(DROP_FILES_TEXT))
                         listModel.remove(0);
                     StartDownloading.getTorrentQueueList().addAll(arr);
+
+
                 }
-            }
+            });
         });
         toolbar.add(toolbarButton);
         toolbarButton = new JButton("Clear All Files");
